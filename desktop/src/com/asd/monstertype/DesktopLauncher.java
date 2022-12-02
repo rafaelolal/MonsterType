@@ -8,6 +8,9 @@ import com.asd.monstertype.GameClass;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+
+		config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+
 		config.setForegroundFPS(60);
 		config.setTitle("Monster Type");
 		new Lwjgl3Application(new GameClass(), config);
