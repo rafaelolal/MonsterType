@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -21,8 +23,12 @@ public class GameScreen implements Screen {
     //graphics
 
     private SpriteBatch batch;
+    private TextureAtlas textureAtlas;
 
-    private Texture[] backgrounds;
+    private TextureRegion[] backgrounds;
+    private float backgroundHeight;
+
+    private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion;
 
     //timing
 
@@ -34,6 +40,12 @@ public class GameScreen implements Screen {
     private final int WORLD_WIDTH = 1280;
     private final int WORLD_HEIGHT = 720;
 
+    // game objects
+
+    private Character playerCharacter;
+    private Character enemyCharacter;
+
+
     // audio
 
     private Music music;
@@ -44,13 +56,30 @@ public class GameScreen implements Screen {
         camera = new OrthographicCamera();
         viewport = new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
 
-        backgrounds = new Texture[4];
-        backgrounds[0] = new Texture("gameBackground(TEMP).jpg");
-        backgrounds[1] = new Texture("walterWhite.png");
-        backgrounds[2] = new Texture("jessePinkman.png");
-        backgrounds[3] = new Texture("saulGoodman.png");
+        // texture atlas setup
 
+        textureAtlas = new TextureAtlas("images.atlas");
+
+        // initialize backgrounds
+
+        backgrounds = new TextureRegion[4];
+        backgrounds[0] = textureAtlas.findRegion("gameBackground(TEMP)");
+        backgrounds[1] = textureAtlas.findRegion("walterWhite");
+        backgrounds[2] = textureAtlas.findRegion("jessePinkman");
+        backgrounds[3] = textureAtlas.findRegion("saulGoodman");
+
+        backgroundHeight = WORLD_HEIGHT * 2;
         backgroundMaxScrollingSpeed =  (float)(WORLD_HEIGHT) / 2;
+
+        // initialize texture regions
+
+        playerCharacterTextureRegion = textureAtlas.findRegion("mikeEhrm");
+        enemyCharacterTextureRegion = textureAtlas.findRegion("hectorSalamanca");
+
+        // game objects set up
+
+        playerCharacter = new Character(2, 200, 140, WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4, playerCharacterTextureRegion);
+        enemyCharacter = new Character(2, 200, 140, WORLD_WIDTH / 2, WORLD_HEIGHT * 3/4, enemyCharacterTextureRegion);
 
         batch = new SpriteBatch();
 
@@ -77,18 +106,44 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
+        // detectInput(deltaTime);
+
+        // background
         renderBackground(deltaTime);
+
+        // playerCharacter
+
+        playerCharacter.draw(batch);
+
+        // enemyCharacter
+
+        enemyCharacter.draw(batch);
 
         batch.end();
 
     }
+
+    /*private void detectInput(float deltaTime) {
+
+        // keyboard input
+
+        float leftLimit, rightLimit, upLimit, downLimit;
+
+        //leftLimit = playerCharacter
+
+
+        // mouse input
+
+    }*/
 
     private void renderBackground(float deltaTime) {
 
         backgroundOffsets[0] += (deltaTime * backgroundMaxScrollingSpeed / 8);
         backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed / 1);
         backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed / 1);
-        backgroundOffsets[3] += (deltaTime * backgroundMaxScrollingSpeed);
+        backgroundOffsets[3] += (deltaTime * backgroundMaxScrollingSpeed * 2);
+
+        // FOR PARALLAX BACKGROUND WHEN REPLACED IN THE FUTURE
 
         /*for (int layer = 0; layer < backgroundOffsets.length; layer++) {
 
@@ -100,6 +155,8 @@ public class GameScreen implements Screen {
             batch.draw(backgrounds[layer], 0, -backgroundOffsets[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
 
         }*/
+
+        // TEMP CODE FOR BREAKING BAD BACKGROUND CHARACTERS
 
         batch.draw(backgrounds[0], 0, -backgroundOffsets[0], WORLD_WIDTH, WORLD_HEIGHT);
         batch.draw(backgrounds[0], 0, -backgroundOffsets[0] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
