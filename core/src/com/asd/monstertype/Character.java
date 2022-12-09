@@ -3,35 +3,68 @@ package com.asd.monstertype;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class Character {
+public abstract class Character {
 
     // characteristics
 
-    float movementSpeed;
+    protected float movementSpeed;
 
     // position & dimensions
 
-    float xPosition, yPosition; // lower-left corner
-    float width, height;
+    protected float xPosition, yPosition; // lower-left corner
+    protected float width, height;
 
     // graphics
 
-    TextureRegion characterTexture;
+    protected TextureRegion characterTextureRegion, projectileTextureRegion;
 
-    public Character(float movementSpeed, float width, float height, float xCenter, float yCenter, TextureRegion characterTexture) {
+    // projectile information
+
+    protected float projectileWidth, projectileHeight;
+    protected float projectileMovementSpeed;
+    protected float timeBetweenShots;
+    protected float timeSinceLastShot = 0;
+
+
+    public Character(float movementSpeed, float width, float height, float xCenter, float yCenter, TextureRegion characterTextureRegion, TextureRegion projectileTextureRegion) {
 
         this.movementSpeed = movementSpeed;
         this.width = width;
         this.height = height;
-        this.xPosition = xCenter - width/2;
-        this.yPosition = yCenter - height/2;
-        this.characterTexture = characterTexture;
+        this.xPosition = xCenter - width / 2;
+        this.yPosition = yCenter - height / 2;
+        this.characterTextureRegion = characterTextureRegion;
+        this.projectileTextureRegion = projectileTextureRegion;
 
     }
 
+    public void setProjectileCharacteristics(float projectileWidth, float projectileHeight, float projectileMovementSpeed, float timeBetweenShots) {
+
+        this.projectileWidth = projectileWidth;
+        this.projectileHeight = projectileHeight;
+        this.projectileMovementSpeed = projectileMovementSpeed;
+        this.timeBetweenShots = timeBetweenShots;
+
+    }
+
+    public void update(float deltaTime) {
+
+        timeSinceLastShot += deltaTime;
+
+    }
+
+    public boolean canFireProjectile() {
+
+        return (timeSinceLastShot - timeBetweenShots >= 0);
+
+    }
+
+    public abstract Projectile[] fireProjectiles();
+
+
     public void draw(Batch batch) {
 
-        batch.draw(characterTexture, xPosition, yPosition, width, height);
+        batch.draw(characterTextureRegion, xPosition, yPosition, width, height);
 
     }
 

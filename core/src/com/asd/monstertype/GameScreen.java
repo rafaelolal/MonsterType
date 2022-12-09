@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.LinkedList;
+
 
 public class GameScreen implements Screen {
 
@@ -28,7 +30,7 @@ public class GameScreen implements Screen {
     private TextureRegion[] backgrounds;
     private float backgroundHeight;
 
-    private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion;
+    private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion, playerProjectileTextureRegion, enemyProjectileTextureRegion;
 
     //timing
 
@@ -44,6 +46,8 @@ public class GameScreen implements Screen {
 
     private Character playerCharacter;
     private Character enemyCharacter;
+    private LinkedList<Projectile> playerProjectileList;
+    private LinkedList<Projectile> enemyProjectileList;
 
 
     // audio
@@ -75,11 +79,16 @@ public class GameScreen implements Screen {
 
         playerCharacterTextureRegion = textureAtlas.findRegion("mikeEhrm");
         enemyCharacterTextureRegion = textureAtlas.findRegion("hectorSalamanca");
+        playerProjectileTextureRegion = textureAtlas.findRegion("walterWhite");
+        enemyProjectileTextureRegion = textureAtlas.findRegion("walterWhite");
 
         // game objects set up
 
         playerCharacter = new Character(2, 200, 140, WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4, playerCharacterTextureRegion);
         enemyCharacter = new Character(2, 200, 140, WORLD_WIDTH / 2, WORLD_HEIGHT * 3/4, enemyCharacterTextureRegion);
+
+        playerProjectileList = new LinkedList<>();
+        enemyProjectileList = new LinkedList<>();
 
         batch = new SpriteBatch();
 
@@ -119,6 +128,10 @@ public class GameScreen implements Screen {
 
         enemyCharacter.draw(batch);
 
+        // projectiles
+
+
+
         batch.end();
 
     }
@@ -138,9 +151,9 @@ public class GameScreen implements Screen {
 
     private void renderBackground(float deltaTime) {
 
-        backgroundOffsets[0] += (deltaTime * backgroundMaxScrollingSpeed / 8);
-        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed / 1);
-        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed / 1);
+        backgroundOffsets[0] += (deltaTime * backgroundMaxScrollingSpeed * 1/8);
+        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * 1);
+        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed * 1);
         backgroundOffsets[3] += (deltaTime * backgroundMaxScrollingSpeed * 2);
 
         // FOR PARALLAX BACKGROUND WHEN REPLACED IN THE FUTURE
