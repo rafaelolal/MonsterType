@@ -18,6 +18,8 @@ public class EnemyCharacter extends Character {
         Projectile[] projectiles = new Projectile[1];
         projectiles[0] = new Projectile(projectileMovementSpeed, projectileWidth, projectileHeight, xPosition + width / 2, yPosition + height / 2, projectileTextureRegion);
 
+        timeSinceLastShot = 0;
+
         return projectiles;
 
     }

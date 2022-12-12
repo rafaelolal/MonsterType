@@ -21,8 +21,8 @@ public abstract class Character {
     // projectile information
 
     protected float projectileWidth = 100, projectileHeight = 100;
-    protected float projectileMovementSpeed = 300;
-    protected float timeBetweenShots = 10;
+    protected float projectileMovementSpeed = 400;
+    protected float timeBetweenShots = 0.5f;
     protected float timeSinceLastShot = 0;
 
 
