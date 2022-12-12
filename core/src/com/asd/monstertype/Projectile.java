@@ -2,6 +2,7 @@ package com.asd.monstertype;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Projectile {
 
@@ -32,6 +33,12 @@ public class Projectile {
     public void draw(Batch batch) {
 
         batch.draw(projectileTextureRegion, xPosition, yPosition, width, height);
+
+    }
+
+    public Rectangle getBoundingBox() {
+
+        return new Rectangle(xPosition, yPosition, width, height);
 
     }
 

@@ -6,42 +6,56 @@ filter: Nearest, Nearest
 repeat: none
 gameBackground(TEMP)
   rotate: false
-  xy: 1884, 1002
+  xy: 1884, 1142
   size: 1280, 720
   orig: 1280, 720
   offset: 0, 0
   index: -1
+hectorBell
+  rotate: false
+  xy: 4024, 1792
+  size: 70, 70
+  orig: 70, 70
+  offset: 0, 0
+  index: -1
 hectorSalamanca
   rotate: false
-  xy: 1884, 862
+  xy: 1884, 1002
   size: 200, 140
   orig: 200, 140
   offset: 0, 0
   index: -1
 jessePinkman
   rotate: false
-  xy: 1024, 488
+  xy: 1024, 628
   size: 860, 1234
   orig: 860, 1234
   offset: 0, 0
   index: -1
 mikeEhrm
   rotate: false
-  xy: 3164, 1582
+  xy: 0, 0
   size: 200, 140
   orig: 200, 140
   offset: 0, 0
   index: -1
+rain
+  rotate: false
+  xy: 3164, 962
+  size: 860, 900
+  orig: 860, 900
+  offset: 0, 0
+  index: -1
 saulGoodman
   rotate: false
-  xy: 0, 0
+  xy: 0, 140
   size: 920, 512
   orig: 920, 512
   offset: 0, 0
   index: -1
 walterWhite
   rotate: false
-  xy: 0, 512
+  xy: 0, 652
   size: 1024, 1210
   orig: 1024, 1210
   offset: 0, 0

@@ -35,7 +35,7 @@ public class GameScreen implements Screen {
 
     //timing
 
-    private float[] backgroundOffsets = {0, 0, 0, 0};
+    private float[] backgroundOffsets = {0, 0, 0, 0, 0, 0, 0, 0};
     private float backgroundMaxScrollingSpeed;
 
     // world parameters
@@ -67,11 +67,17 @@ public class GameScreen implements Screen {
 
         // initialize backgrounds
 
-        backgrounds = new TextureRegion[4];
+        backgrounds = new TextureRegion[8];
+
         backgrounds[0] = textureAtlas.findRegion("gameBackground(TEMP)");
         backgrounds[1] = textureAtlas.findRegion("walterWhite");
         backgrounds[2] = textureAtlas.findRegion("jessePinkman");
         backgrounds[3] = textureAtlas.findRegion("saulGoodman");
+
+        backgrounds[4] = textureAtlas.findRegion("rain");
+        backgrounds[5] = textureAtlas.findRegion("rain");
+        backgrounds[6] = textureAtlas.findRegion("rain");
+        backgrounds[7] = textureAtlas.findRegion("rain");
 
         backgroundHeight = WORLD_HEIGHT * 2;
         backgroundMaxScrollingSpeed =  (float)(WORLD_HEIGHT) / 2;
@@ -81,8 +87,8 @@ public class GameScreen implements Screen {
         playerCharacterTextureRegion = textureAtlas.findRegion("mikeEhrm");
         enemyCharacterTextureRegion = textureAtlas.findRegion("hectorSalamanca");
 
-        playerProjectileTextureRegion = textureAtlas.findRegion("saulGoodman");
-        enemyProjectileTextureRegion = textureAtlas.findRegion("walterWhite");
+        playerProjectileTextureRegion = textureAtlas.findRegion("hectorBell");
+        enemyProjectileTextureRegion = textureAtlas.findRegion("hectorBell");
 
         // game objects set up
 
@@ -90,7 +96,7 @@ public class GameScreen implements Screen {
                 WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
                 playerCharacterTextureRegion, playerProjectileTextureRegion);
         enemyCharacter = new EnemyCharacter(2, 200, 140,
-                WORLD_WIDTH / 2, WORLD_HEIGHT * 3/4,
+                WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
         playerProjectileList = new LinkedList<>();
@@ -142,7 +148,91 @@ public class GameScreen implements Screen {
 
         // projectiles
 
-        // create projectiles
+        renderProjectiles(deltaTime);
+
+        // detect collisions
+
+        detectCollisions();
+
+        // explosions
+
+        renderExplosions(deltaTime);
+
+        batch.end();
+
+    }
+
+    /*private void detectInput(float deltaTime) {
+
+        // keyboard input
+
+        float leftLimit, rightLimit, upLimit, downLimit;
+
+        leftLimit = playerCharacter
+
+
+        // mouse input
+
+    }*/
+
+    private void renderBackground(float deltaTime) {
+
+        backgroundOffsets[0] += (deltaTime * backgroundMaxScrollingSpeed * 1/8);
+        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * 1);
+        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed * 1);
+        backgroundOffsets[3] += (deltaTime * backgroundMaxScrollingSpeed * 2);
+
+        backgroundOffsets[4] += (deltaTime * backgroundMaxScrollingSpeed * 2);
+        backgroundOffsets[5] += (deltaTime * backgroundMaxScrollingSpeed * 4);
+        backgroundOffsets[6] += (deltaTime * backgroundMaxScrollingSpeed * 3);
+        backgroundOffsets[7] += (deltaTime * backgroundMaxScrollingSpeed * 8);
+
+        // TEMP CODE FOR BREAKING BAD BACKGROUND CHARACTERS
+
+        batch.draw(backgrounds[0], 0, -backgroundOffsets[0], WORLD_WIDTH, WORLD_HEIGHT);
+        batch.draw(backgrounds[0], 0, -backgroundOffsets[0] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
+
+        if (backgroundOffsets[0] > WORLD_HEIGHT) {
+            backgroundOffsets[0] = 0;
+        }
+
+        batch.draw(backgrounds[1], 500, -backgroundOffsets[1], WORLD_WIDTH, WORLD_HEIGHT);
+        batch.draw(backgrounds[1], 500, -backgroundOffsets[1] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
+
+        if (backgroundOffsets[1] > WORLD_HEIGHT) {
+            backgroundOffsets[1] = 0;
+        }
+
+        batch.draw(backgrounds[2], -500, backgroundOffsets[2], WORLD_WIDTH, WORLD_HEIGHT);
+        batch.draw(backgrounds[2], -500, backgroundOffsets[2] - WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
+
+        if (backgroundOffsets[2] > WORLD_HEIGHT) {
+            backgroundOffsets[2] = 0;
+        }
+
+        batch.draw(backgrounds[3], 0, -backgroundOffsets[3], WORLD_WIDTH, WORLD_HEIGHT);
+        batch.draw(backgrounds[3], 0, -backgroundOffsets[3] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
+
+        if (backgroundOffsets[3] > WORLD_HEIGHT) {
+            backgroundOffsets[3] = 0;
+        }
+
+        // FOR PARALLAX BACKGROUND WHEN REPLACED IN THE FUTURE
+
+        for (int layer = 4; layer < backgroundOffsets.length; layer++) {
+
+            if (backgroundOffsets[layer] > WORLD_HEIGHT) {
+                backgroundOffsets[layer] = 0;
+            }
+
+            batch.draw(backgrounds[layer], 0, -backgroundOffsets[layer], WORLD_WIDTH, WORLD_HEIGHT);
+            batch.draw(backgrounds[layer], 0, -backgroundOffsets[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
+
+        }
+
+    }
+
+    private void renderProjectiles(float deltaTime) {
 
         if (playerCharacter.canFireProjectile()) {
 
@@ -163,9 +253,6 @@ public class GameScreen implements Screen {
             }
 
         }
-
-
-        // draw projectiles
 
         // draw & remove old projectiles
 
@@ -198,74 +285,52 @@ public class GameScreen implements Screen {
         }
 
 
+    }
 
+    public void renderExplosions(float deltaTime) {
 
-        batch.end();
+        // WIP
 
     }
 
-    /*private void detectInput(float deltaTime) {
+    public void detectCollisions() {
 
-        // keyboard input
+        // player projectiles
 
-        float leftLimit, rightLimit, upLimit, downLimit;
+        ListIterator<Projectile> iterator = playerProjectileList.listIterator();
 
-        //leftLimit = playerCharacter
+        while (iterator.hasNext()) {
 
+            Projectile projectile = iterator.next();
 
-        // mouse input
+            if (enemyCharacter.intersects(projectile.getBoundingBox())) {
 
-    }*/
+                // collision with enemy character
+                iterator.remove();
 
-    private void renderBackground(float deltaTime) {
-
-        backgroundOffsets[0] += (deltaTime * backgroundMaxScrollingSpeed * 1/8);
-        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * 1);
-        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed * 1);
-        backgroundOffsets[3] += (deltaTime * backgroundMaxScrollingSpeed * 2);
-
-        // FOR PARALLAX BACKGROUND WHEN REPLACED IN THE FUTURE
-
-        /*for (int layer = 0; layer < backgroundOffsets.length; layer++) {
-
-            if (backgroundOffsets[layer] > WORLD_HEIGHT) {
-                backgroundOffsets[layer] = 0;
             }
 
-            batch.draw(backgrounds[layer], 0, -backgroundOffsets[layer], WORLD_WIDTH, WORLD_HEIGHT);
-            batch.draw(backgrounds[layer], 0, -backgroundOffsets[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
-
-        }*/
-
-        // TEMP CODE FOR BREAKING BAD BACKGROUND CHARACTERS
-
-        batch.draw(backgrounds[0], 0, -backgroundOffsets[0], WORLD_WIDTH, WORLD_HEIGHT);
-        batch.draw(backgrounds[0], 0, -backgroundOffsets[0] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
-
-        if (backgroundOffsets[0] > WORLD_HEIGHT) {
-            backgroundOffsets[0] = 0;
         }
 
-        batch.draw(backgrounds[1], 500, -backgroundOffsets[1], WORLD_WIDTH, WORLD_HEIGHT);
-        batch.draw(backgrounds[1], 500, -backgroundOffsets[1] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
+        // enemy projectiles
 
-        if (backgroundOffsets[1] > WORLD_HEIGHT) {
-            backgroundOffsets[1] = 0;
+        iterator = enemyProjectileList.listIterator();
+
+        while (iterator.hasNext()) {
+
+            Projectile projectile = iterator.next();
+
+            if (playerCharacter.intersects(projectile.getBoundingBox())) {
+
+                // collision with player character
+                iterator.remove();
+
+            }
+
         }
 
-        batch.draw(backgrounds[2], -500, backgroundOffsets[2], WORLD_WIDTH, WORLD_HEIGHT);
-        batch.draw(backgrounds[2], -500, backgroundOffsets[2] - WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
 
-        if (backgroundOffsets[2] > WORLD_HEIGHT) {
-            backgroundOffsets[2] = 0;
-        }
 
-        batch.draw(backgrounds[3], 0, -backgroundOffsets[3], WORLD_WIDTH, WORLD_HEIGHT);
-        batch.draw(backgrounds[3], 0, -backgroundOffsets[3] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
-
-        if (backgroundOffsets[3] > WORLD_HEIGHT) {
-            backgroundOffsets[3] = 0;
-        }
 
     }
 

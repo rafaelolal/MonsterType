@@ -2,6 +2,7 @@ package com.asd.monstertype;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character {
 
@@ -20,7 +21,7 @@ public abstract class Character {
 
     // projectile information
 
-    protected float projectileWidth = 100, projectileHeight = 100;
+    protected float projectileWidth = 50, projectileHeight = 50;
     protected float projectileMovementSpeed = 400;
     protected float timeBetweenShots = 0.5f;
     protected float timeSinceLastShot = 0;
@@ -45,6 +46,15 @@ public abstract class Character {
 
     }
 
+    public void changeProjectileCharacteristics(float projectileWidth, float projectileHeight, float projectileMovementSpeed, float timeBetweenShots) {
+
+        this.projectileWidth = projectileWidth;
+        this.projectileHeight = projectileHeight;
+        this.projectileMovementSpeed = projectileMovementSpeed;
+        this.timeBetweenShots = timeBetweenShots;
+
+    }
+
     public boolean canFireProjectile() {
 
         return (timeSinceLastShot - timeBetweenShots >= 0);
@@ -53,6 +63,12 @@ public abstract class Character {
 
     public abstract Projectile[] fireProjectiles();
 
+    public boolean intersects(Rectangle otherRectangle) {
+
+        Rectangle thisRectangle = new Rectangle(xPosition, yPosition, width, height);
+        return thisRectangle.overlaps(otherRectangle);
+
+    }
 
     public void draw(Batch batch) {
 
