@@ -2,9 +2,9 @@ package com.asd.monstertype;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class PlayerCharacter extends Character {
+public class EnemyCharacter extends Character {
 
-    public PlayerCharacter(float movementSpeed, float width, float height, float xCenter, float yCenter,
+    public EnemyCharacter(float movementSpeed, float width, float height, float xCenter, float yCenter,
                            TextureRegion characterTextureRegion, TextureRegion projectileTextureRegion) {
 
         super(movementSpeed, width, height, xCenter, yCenter,

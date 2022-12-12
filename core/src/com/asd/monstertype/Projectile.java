@@ -7,12 +7,12 @@ public class Projectile {
 
     // characteristics
 
-    private float movementSpeed;
+    protected float movementSpeed;
 
     // position & dimensions
 
-    private float xPosition, yPosition; // lower center
-    private float width, height;
+    protected float xPosition, yPosition; // lower center
+    protected float width, height;
 
     // graphics
 
@@ -23,8 +23,8 @@ public class Projectile {
         this.movementSpeed = movementSpeed;
         this.width = width;
         this.height = height;
-        this.xPosition = xCenter - width/2;
-        this.yPosition = yCenter - height/2;
+        this.xPosition = xCenter - width / 2;
+        this.yPosition = yCenter - height / 2;
         this.projectileTextureRegion = projectileTextureRegion;
 
     }

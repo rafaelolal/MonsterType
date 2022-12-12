@@ -20,13 +20,14 @@ public abstract class Character {
 
     // projectile information
 
-    protected float projectileWidth, projectileHeight;
-    protected float projectileMovementSpeed;
-    protected float timeBetweenShots;
+    protected float projectileWidth = 100, projectileHeight = 100;
+    protected float projectileMovementSpeed = 300;
+    protected float timeBetweenShots = 10;
     protected float timeSinceLastShot = 0;
 
 
-    public Character(float movementSpeed, float width, float height, float xCenter, float yCenter, TextureRegion characterTextureRegion, TextureRegion projectileTextureRegion) {
+    public Character(float movementSpeed, float width, float height, float xCenter, float yCenter,
+                     TextureRegion characterTextureRegion, TextureRegion projectileTextureRegion) {
 
         this.movementSpeed = movementSpeed;
         this.width = width;
@@ -35,15 +36,6 @@ public abstract class Character {
         this.yPosition = yCenter - height / 2;
         this.characterTextureRegion = characterTextureRegion;
         this.projectileTextureRegion = projectileTextureRegion;
-
-    }
-
-    public void setProjectileCharacteristics(float projectileWidth, float projectileHeight, float projectileMovementSpeed, float timeBetweenShots) {
-
-        this.projectileWidth = projectileWidth;
-        this.projectileHeight = projectileHeight;
-        this.projectileMovementSpeed = projectileMovementSpeed;
-        this.timeBetweenShots = timeBetweenShots;
 
     }
 

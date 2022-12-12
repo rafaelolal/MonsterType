@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 
 public class GameScreen implements Screen {
@@ -79,13 +80,18 @@ public class GameScreen implements Screen {
 
         playerCharacterTextureRegion = textureAtlas.findRegion("mikeEhrm");
         enemyCharacterTextureRegion = textureAtlas.findRegion("hectorSalamanca");
-        playerProjectileTextureRegion = textureAtlas.findRegion("walterWhite");
+
+        playerProjectileTextureRegion = textureAtlas.findRegion("saulGoodman");
         enemyProjectileTextureRegion = textureAtlas.findRegion("walterWhite");
 
         // game objects set up
 
-        playerCharacter = new Character(2, 200, 140, WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4, playerCharacterTextureRegion);
-        enemyCharacter = new Character(2, 200, 140, WORLD_WIDTH / 2, WORLD_HEIGHT * 3/4, enemyCharacterTextureRegion);
+        playerCharacter = new PlayerCharacter(2, 200, 140,
+                WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
+                playerCharacterTextureRegion, playerProjectileTextureRegion);
+        enemyCharacter = new EnemyCharacter(2, 200, 140,
+                WORLD_WIDTH / 2, WORLD_HEIGHT * 3/4,
+                enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
         playerProjectileList = new LinkedList<>();
         enemyProjectileList = new LinkedList<>();
@@ -115,20 +121,82 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
-        // detectInput(deltaTime);
+        // update characters
 
-        // background
+        playerCharacter.update(deltaTime);
+        enemyCharacter.update(deltaTime);
+
+        // draw background
+
+
         renderBackground(deltaTime);
 
-        // playerCharacter
+
+        // draw playerCharacter
 
         playerCharacter.draw(batch);
 
-        // enemyCharacter
+        // draw enemyCharacter
 
         enemyCharacter.draw(batch);
 
         // projectiles
+
+        // create projectiles
+
+        if (playerCharacter.canFireProjectile()) {
+
+            Projectile[] projectiles = playerCharacter.fireProjectiles();
+
+            for (Projectile projectile: projectiles) {
+                playerProjectileList.add(projectile);
+            }
+
+        }
+
+        if (enemyCharacter.canFireProjectile()) {
+
+            Projectile[] projectiles = enemyCharacter.fireProjectiles();
+
+            for (Projectile projectile: projectiles) {
+                enemyProjectileList.add(projectile);
+            }
+
+        }
+
+
+        // draw projectiles
+
+        // draw & remove old projectiles
+
+        ListIterator<Projectile> iterator = playerProjectileList.listIterator();
+
+        while (iterator.hasNext()) {
+
+            Projectile projectile = iterator.next();
+            projectile.draw(batch);
+            projectile.yPosition += (projectile.movementSpeed * deltaTime);
+
+            if (projectile.yPosition > WORLD_HEIGHT) {
+                iterator.remove();
+            }
+
+        }
+
+        iterator = enemyProjectileList.listIterator();
+
+        while (iterator.hasNext()) {
+
+            Projectile projectile = iterator.next();
+            projectile.draw(batch);
+            projectile.yPosition -= projectile.movementSpeed * deltaTime;
+
+            if (projectile.yPosition + projectile.height < 0) {
+                iterator.remove();
+            }
+
+        }
+
 
 
 
