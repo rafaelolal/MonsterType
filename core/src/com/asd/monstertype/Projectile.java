@@ -12,33 +12,25 @@ public class Projectile {
 
     // position & dimensions
 
-    protected float xPosition, yPosition; // lower center
-    protected float width, height;
+    protected Rectangle boundingBox;
 
     // graphics
 
     TextureRegion projectileTextureRegion;
 
-    public Projectile(float movementSpeed, float width, float height, float xCenter, float yCenter, TextureRegion projectileTextureRegion) {
+    public Projectile(float movementSpeed, float width, float height, float xCenter, float yBottom, TextureRegion projectileTextureRegion) {
 
         this.movementSpeed = movementSpeed;
-        this.width = width;
-        this.height = height;
-        this.xPosition = xCenter - width / 2;
-        this.yPosition = yCenter - height / 2;
+
+        this.boundingBox = new Rectangle(xCenter - width / 2, yBottom, width, height);
+
         this.projectileTextureRegion = projectileTextureRegion;
 
     }
 
     public void draw(Batch batch) {
 
-        batch.draw(projectileTextureRegion, xPosition, yPosition, width, height);
-
-    }
-
-    public Rectangle getBoundingBox() {
-
-        return new Rectangle(xPosition, yPosition, width, height);
+        batch.draw(projectileTextureRegion, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight());
 
     }
 

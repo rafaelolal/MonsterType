@@ -12,8 +12,7 @@ public abstract class Character {
 
     // position & dimensions
 
-    protected float xPosition, yPosition; // lower-left corner
-    protected float width, height;
+    protected Rectangle boundingBox;
 
     // graphics
 
@@ -22,7 +21,7 @@ public abstract class Character {
     // projectile information
 
     protected float projectileWidth = 50, projectileHeight = 50;
-    protected float projectileMovementSpeed = 400;
+    protected float projectileMovementSpeed = 40;
     protected float timeBetweenShots = 0.5f;
     protected float timeSinceLastShot = 0;
 
@@ -31,10 +30,9 @@ public abstract class Character {
                      TextureRegion characterTextureRegion, TextureRegion projectileTextureRegion) {
 
         this.movementSpeed = movementSpeed;
-        this.width = width;
-        this.height = height;
-        this.xPosition = xCenter - width / 2;
-        this.yPosition = yCenter - height / 2;
+
+        this.boundingBox = new Rectangle(xCenter - width / 2, yCenter - height / 2, width, height);
+
         this.characterTextureRegion = characterTextureRegion;
         this.projectileTextureRegion = projectileTextureRegion;
 
@@ -65,14 +63,25 @@ public abstract class Character {
 
     public boolean intersects(Rectangle otherRectangle) {
 
-        Rectangle thisRectangle = new Rectangle(xPosition, yPosition, width, height);
-        return thisRectangle.overlaps(otherRectangle);
+        return boundingBox.overlaps(otherRectangle);
+
+    }
+
+    public void hit(Projectile projectile) {
+
+
+
+    }
+
+    public void translate(float xChange, float yChange) {
+
+        boundingBox.setPosition(boundingBox.getX() + xChange, boundingBox.getY() + yChange);
 
     }
 
     public void draw(Batch batch) {
 
-        batch.draw(characterTextureRegion, xPosition, yPosition, width, height);
+        batch.draw(characterTextureRegion, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight());
 
     }
 

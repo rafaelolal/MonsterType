@@ -1,6 +1,7 @@
 package com.asd.monstertype;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Camera;
@@ -127,6 +128,8 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
+        detectInput(deltaTime);
+
         // update characters
 
         playerCharacter.update(deltaTime);
@@ -162,18 +165,32 @@ public class GameScreen implements Screen {
 
     }
 
-    /*private void detectInput(float deltaTime) {
+    private void detectInput(float deltaTime) {
 
         // keyboard input
 
-        float leftLimit, rightLimit, upLimit, downLimit;
+        float rightLimit, leftLimit, upLimit, downLimit;
 
-        leftLimit = playerCharacter
+        rightLimit = WORLD_WIDTH - playerCharacter.boundingBox.getX() - playerCharacter.boundingBox.getWidth();
+        leftLimit = -playerCharacter.boundingBox.getX();
+
+        upLimit = WORLD_HEIGHT / 2 - playerCharacter.boundingBox.getY() - playerCharacter.boundingBox.getHeight();
+        downLimit = -playerCharacter.boundingBox.getY();
+
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && rightLimit > 0) {
+
+            float xChange = playerCharacter.movementSpeed * deltaTime;
+
+            xChange = Math.min(xChange, rightLimit);
+
+            playerCharacter.translate(xChange, 0f);
+
+        }
 
 
         // mouse input
 
-    }*/
+    }
 
     private void renderBackground(float deltaTime) {
 
@@ -262,9 +279,9 @@ public class GameScreen implements Screen {
 
             Projectile projectile = iterator.next();
             projectile.draw(batch);
-            projectile.yPosition += (projectile.movementSpeed * deltaTime);
+            projectile.boundingBox.y += (projectile.movementSpeed * deltaTime);
 
-            if (projectile.yPosition > WORLD_HEIGHT) {
+            if (projectile.boundingBox.y > WORLD_HEIGHT) {
                 iterator.remove();
             }
 
@@ -276,9 +293,9 @@ public class GameScreen implements Screen {
 
             Projectile projectile = iterator.next();
             projectile.draw(batch);
-            projectile.yPosition -= projectile.movementSpeed * deltaTime;
+            projectile.boundingBox.y -= projectile.movementSpeed * deltaTime;
 
-            if (projectile.yPosition + projectile.height < 0) {
+            if (projectile.boundingBox.y + projectile.boundingBox.height < 0) {
                 iterator.remove();
             }
 
@@ -287,13 +304,13 @@ public class GameScreen implements Screen {
 
     }
 
-    public void renderExplosions(float deltaTime) {
+    private void renderExplosions(float deltaTime) {
 
         // WIP
 
     }
 
-    public void detectCollisions() {
+    private void detectCollisions() {
 
         // player projectiles
 
@@ -303,9 +320,10 @@ public class GameScreen implements Screen {
 
             Projectile projectile = iterator.next();
 
-            if (enemyCharacter.intersects(projectile.getBoundingBox())) {
+            if (enemyCharacter.intersects(projectile.boundingBox)) {
 
                 // collision with enemy character
+                enemyCharacter.hit(projectile);
                 iterator.remove();
 
             }
@@ -320,9 +338,10 @@ public class GameScreen implements Screen {
 
             Projectile projectile = iterator.next();
 
-            if (playerCharacter.intersects(projectile.getBoundingBox())) {
+            if (playerCharacter.intersects(projectile.boundingBox)) {
 
                 // collision with player character
+                playerCharacter.hit(projectile);
                 iterator.remove();
 
             }

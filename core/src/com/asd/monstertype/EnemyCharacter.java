@@ -16,7 +16,7 @@ public class EnemyCharacter extends Character {
     public Projectile[] fireProjectiles() {
 
         Projectile[] projectiles = new Projectile[1];
-        projectiles[0] = new Projectile(projectileMovementSpeed, projectileWidth, projectileHeight, xPosition + width / 2, yPosition + height / 2, projectileTextureRegion);
+        projectiles[0] = new Projectile(projectileMovementSpeed, projectileWidth, projectileHeight, boundingBox.getX() + boundingBox.getWidth() / 2, boundingBox.getY() + boundingBox.getHeight() / 2, projectileTextureRegion);
 
         timeSinceLastShot = 0;
 
