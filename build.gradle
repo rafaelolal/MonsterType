@@ -9,11 +9,6 @@ buildscript {
         google()
     }
     dependencies {
-<<<<<<< HEAD
-        classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
-        classpath 'org.gretty:gretty:3.0.7'
-=======
->>>>>>> origin/sandro
         
 
     }
@@ -52,10 +47,7 @@ project(":desktop") {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-<<<<<<< HEAD
-=======
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
->>>>>>> origin/sandro
         
     }
 }
@@ -66,27 +58,8 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-<<<<<<< HEAD
-        
-    }
-}
-
-project(":html") {
-    apply plugin: "java-library"
-    apply plugin: "gwt"
-    apply plugin: "war"
-    apply plugin: "org.gretty"
-
-
-    dependencies {
-        implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-=======
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
->>>>>>> origin/sandro
         
     }
 }
