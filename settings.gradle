@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 include 'desktop', 'core', 'html'
+=======
+include 'desktop', 'core'
+>>>>>>> origin/sandro
