@@ -93,10 +93,10 @@ public class GameScreen implements Screen {
 
         // game objects set up
 
-        playerCharacter = new PlayerCharacter(2, 200, 140,
+        playerCharacter = new PlayerCharacter(200, 200, 140,
                 WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
                 playerCharacterTextureRegion, playerProjectileTextureRegion);
-        enemyCharacter = new EnemyCharacter(2, 200, 140,
+        enemyCharacter = new EnemyCharacter(200, 200, 140,
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
@@ -179,14 +179,36 @@ public class GameScreen implements Screen {
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && rightLimit > 0) {
 
-            float xChange = playerCharacter.movementSpeed * deltaTime;
-
-            xChange = Math.min(xChange, rightLimit);
+            float xChange = Math.min(playerCharacter.movementSpeed * deltaTime, rightLimit);
 
             playerCharacter.translate(xChange, 0f);
 
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && leftLimit < 0) {
+
+            float xChange = Math.max(-playerCharacter.movementSpeed * deltaTime, leftLimit);
+
+            playerCharacter.translate(xChange, 0f);
+
+        }
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) && upLimit > 0) {
+
+            float yChange = Math.min(playerCharacter.movementSpeed * deltaTime, upLimit);
+
+            playerCharacter.translate(0f, yChange);
+
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && downLimit < 0) {
+
+            float yChange = Math.max(-playerCharacter.movementSpeed * deltaTime, leftLimit);
+
+            playerCharacter.translate(0f, yChange);
+
+        }
 
         // mouse input
 
