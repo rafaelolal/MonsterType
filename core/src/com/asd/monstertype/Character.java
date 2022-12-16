@@ -21,8 +21,8 @@ public abstract class Character {
     // projectile information
 
     protected float projectileWidth = 50, projectileHeight = 50;
-    protected float projectileMovementSpeed = 200;
-    protected float timeBetweenShots = 1;
+    protected float projectileMovementSpeed = 500;
+    protected float timeBetweenShots = 0.5f;
     protected float timeSinceLastShot = 0;
 
 
@@ -67,9 +67,9 @@ public abstract class Character {
 
     }
 
-    public void hit(Projectile projectile) {
+    public boolean hitAndCheckDestroyed(Projectile projectile) {
 
-
+        return true;
 
     }
 

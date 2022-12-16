@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -32,6 +33,8 @@ public class GameScreen implements Screen {
     private TextureRegion[] backgrounds;
     private float backgroundHeight;
 
+    private Texture explosionTexture;
+
     private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion, playerProjectileTextureRegion, enemyProjectileTextureRegion;
 
     //timing
@@ -46,10 +49,11 @@ public class GameScreen implements Screen {
 
     // game objects
 
-    private Character playerCharacter;
-    private Character enemyCharacter;
+    private PlayerCharacter playerCharacter;
+    private EnemyCharacter enemyCharacter;
     private LinkedList<Projectile> playerProjectileList;
     private LinkedList<Projectile> enemyProjectileList;
+    private LinkedList<Explosion> explosionList;
 
 
     // audio
@@ -91,17 +95,22 @@ public class GameScreen implements Screen {
         playerProjectileTextureRegion = textureAtlas.findRegion("hectorBell");
         enemyProjectileTextureRegion = textureAtlas.findRegion("hectorBell");
 
+        explosionTexture = new Texture("explosion.png");
+
         // game objects set up
 
-        playerCharacter = new PlayerCharacter(200, 200, 140,
+        playerCharacter = new PlayerCharacter(500, 200, 140,
                 WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
                 playerCharacterTextureRegion, playerProjectileTextureRegion);
-        enemyCharacter = new EnemyCharacter(200, 200, 140,
+
+        enemyCharacter = new EnemyCharacter(500, 200, 140,
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
         playerProjectileList = new LinkedList<>();
         enemyProjectileList = new LinkedList<>();
+
+        explosionList = new LinkedList<>();
 
         batch = new SpriteBatch();
 
@@ -159,7 +168,7 @@ public class GameScreen implements Screen {
 
         // explosions
 
-        renderExplosions(deltaTime);
+        updateAndRenderExplosions(deltaTime);
 
         batch.end();
 
@@ -174,7 +183,7 @@ public class GameScreen implements Screen {
         rightLimit = WORLD_WIDTH - playerCharacter.boundingBox.getX() - playerCharacter.boundingBox.getWidth();
         leftLimit = -playerCharacter.boundingBox.getX();
 
-        upLimit = WORLD_HEIGHT / 2 - playerCharacter.boundingBox.getY() - playerCharacter.boundingBox.getHeight();
+        upLimit = (float)WORLD_HEIGHT / 2 - playerCharacter.boundingBox.getY() - playerCharacter.boundingBox.getHeight();
         downLimit = -playerCharacter.boundingBox.getY();
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && rightLimit > 0) {
@@ -210,7 +219,45 @@ public class GameScreen implements Screen {
 
         }
 
-        // mouse input
+        moveEnemies(deltaTime);
+
+
+    }
+
+    private void moveEnemies(float deltaTime) {
+
+        float rightLimit, leftLimit, upLimit, downLimit;
+
+        rightLimit = WORLD_WIDTH - enemyCharacter.boundingBox.getX() - enemyCharacter.boundingBox.getWidth();
+        leftLimit = -enemyCharacter.boundingBox.getX();
+
+        upLimit = WORLD_HEIGHT - enemyCharacter.boundingBox.getY() - enemyCharacter.boundingBox.getHeight();
+        downLimit = (float)WORLD_HEIGHT / 2 -enemyCharacter.boundingBox.getY();
+
+        float xMove = enemyCharacter.getDirectionVector().x * enemyCharacter.movementSpeed * deltaTime;
+        float yMove = enemyCharacter.getDirectionVector().y * enemyCharacter.movementSpeed * deltaTime;
+
+        if (xMove > 0) {
+
+            xMove = Math.min(xMove, rightLimit);
+
+        } else {
+
+            xMove = Math.max(xMove, leftLimit);
+
+        }
+
+        if (yMove > 0) {
+
+            yMove = Math.min(yMove, upLimit);
+
+        } else {
+
+            yMove = Math.max(yMove, downLimit);
+
+        }
+
+        enemyCharacter.translate(xMove, yMove);
 
     }
 
@@ -326,9 +373,26 @@ public class GameScreen implements Screen {
 
     }
 
-    private void renderExplosions(float deltaTime) {
+    private void updateAndRenderExplosions(float deltaTime) {
 
-        // WIP
+        ListIterator<Explosion> explosionListIterator = explosionList.listIterator();
+
+        while (explosionListIterator.hasNext()) {
+
+            Explosion explosion = explosionListIterator.next();
+            explosion.update(deltaTime);
+
+            if (explosion.animationFinished()) {
+
+                explosionListIterator.remove();
+
+            } else {
+
+                explosion.draw(batch);
+
+            }
+
+        }
 
     }
 
@@ -345,7 +409,12 @@ public class GameScreen implements Screen {
             if (enemyCharacter.intersects(projectile.boundingBox)) {
 
                 // collision with enemy character
-                enemyCharacter.hit(projectile);
+                if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
+
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 0.7f));
+
+                }
+
                 iterator.remove();
 
             }
@@ -363,7 +432,12 @@ public class GameScreen implements Screen {
             if (playerCharacter.intersects(projectile.boundingBox)) {
 
                 // collision with player character
-                playerCharacter.hit(projectile);
+                if (playerCharacter.hitAndCheckDestroyed(projectile)) {
+
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 0.7f));
+
+                }
+
                 iterator.remove();
 
             }
