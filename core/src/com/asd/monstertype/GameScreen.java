@@ -4,18 +4,24 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Locale;
 
 
 public class GameScreen implements Screen {
@@ -55,11 +61,20 @@ public class GameScreen implements Screen {
     private LinkedList<Projectile> enemyProjectileList;
     private LinkedList<Explosion> explosionList;
 
+    private int playerScore = 0;
+    private int enemyScore = 0;
+
 
     // audio
 
     private Music music;
+    private Sound explosion = Gdx.audio.newSound(Gdx.files.internal("explosion.mp3"));
 
+    // HUD
+
+    BitmapFont font1;
+    BitmapFont font2;
+    float hudVerticalMargin, hudLeftX, hudRightX, hudCenterX, hudRow1Y, hudRow2Y, hudSectionWidth;
 
     GameScreen() {
 
@@ -103,6 +118,8 @@ public class GameScreen implements Screen {
                 WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
                 playerCharacterTextureRegion, playerProjectileTextureRegion);
 
+        //playerCharacter.changeProjectileCharacteristics(playerCharacter.projectileHeight, playerCharacter.projectileWidth, playerCharacter.projectileMovementSpeed, 0.1f);
+
         enemyCharacter = new EnemyCharacter(500, 200, 140,
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
@@ -113,6 +130,8 @@ public class GameScreen implements Screen {
         explosionList = new LinkedList<>();
 
         batch = new SpriteBatch();
+
+        prepareHUD();
 
         Music saulMusic = Gdx.audio.newMusic(Gdx.files.internal("saulMusic.mp3"));
         Music saulSound = Gdx.audio.newMusic(Gdx.files.internal("saulSound.mp3"));
@@ -129,6 +148,48 @@ public class GameScreen implements Screen {
         saulMusic.play();
         saulSound.play();
         vineBoom.play();
+
+    }
+
+    private void prepareHUD() {
+
+        // create bitmap fonts from file
+
+        FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("BreakingBad.otf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+
+        fontParameter.size = 80;
+        fontParameter.borderWidth = 4;
+        fontParameter.color = new Color(0, 255, 0, 1);
+        fontParameter.borderColor = new Color(0, 0, 0, 3);
+
+        font1 = fontGenerator.generateFont(fontParameter);
+
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("EdgeFont.otf"));
+
+        font2 = fontGenerator.generateFont(fontParameter);
+
+
+        // scale font
+
+        font1.getData().setScale(0.8f);
+        font2.getData().setScale(0.6f);
+
+        // calculate hud parameters
+
+        hudVerticalMargin = font1.getCapHeight() / 2;
+
+        hudLeftX = hudVerticalMargin;
+
+        hudRightX = (float)WORLD_WIDTH * 2/3 - hudLeftX;
+
+        hudCenterX = (float)WORLD_WIDTH * 1/3;
+
+        hudRow1Y = WORLD_HEIGHT - hudVerticalMargin;
+
+        hudRow2Y = hudRow1Y - hudVerticalMargin - font1.getCapHeight();
+
+        hudSectionWidth = hudCenterX;
 
     }
 
@@ -169,6 +230,10 @@ public class GameScreen implements Screen {
         // explosions
 
         updateAndRenderExplosions(deltaTime);
+
+        // hud
+
+        updateAndRenderHUD();
 
         batch.end();
 
@@ -396,6 +461,21 @@ public class GameScreen implements Screen {
 
     }
 
+    private void updateAndRenderHUD() {
+
+        // top row
+
+        font1.draw(batch, "Player One Score", hudLeftX, hudRow1Y, hudSectionWidth, Align.left, false);
+        font1.draw(batch, "Enemy Score", hudRightX, hudRow1Y, hudSectionWidth, Align.right, false);
+
+        // second row
+
+        font2.draw(batch, String.format(Locale.getDefault(), "%05d", playerScore), hudLeftX, hudRow2Y, hudSectionWidth, Align.left, false);
+
+        font2.draw(batch, String.format(Locale.getDefault(), "%05d", enemyScore), hudRightX, hudRow2Y, hudSectionWidth, Align.right, false);
+
+    }
+
     private void detectCollisions() {
 
         // player projectiles
@@ -412,6 +492,8 @@ public class GameScreen implements Screen {
                 if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
 
                     explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 0.7f));
+                    explosion.play(0.75f);
+                    playerScore++;
 
                 }
 
@@ -434,7 +516,9 @@ public class GameScreen implements Screen {
                 // collision with player character
                 if (playerCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 0.7f));
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 0.7f));
+                    explosion.play(0.75f);
+                    enemyScore++;
 
                 }
 
@@ -443,9 +527,6 @@ public class GameScreen implements Screen {
             }
 
         }
-
-
-
 
     }
 
