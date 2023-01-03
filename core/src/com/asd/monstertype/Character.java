@@ -53,6 +53,14 @@ public abstract class Character {
 
     }
 
+    public void stop() {
+
+        this.movementSpeed = 0;
+        this.projectileMovementSpeed = 0;
+        this.timeBetweenShots = Float.POSITIVE_INFINITY;
+
+    }
+
     public boolean canFireProjectile() {
 
         return (timeSinceLastShot - timeBetweenShots >= 0);

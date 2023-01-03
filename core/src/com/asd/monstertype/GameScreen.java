@@ -52,6 +52,7 @@ public class GameScreen implements Screen {
 
     private final int WORLD_WIDTH = 1280;
     private final int WORLD_HEIGHT = 720;
+    private boolean explodeLevel = false;
 
     // game objects
 
@@ -67,8 +68,13 @@ public class GameScreen implements Screen {
 
     // audio
 
-    private Music music;
+    private Music saulMusic;
+    private Music saulSound;
+    private Music vineBoom;
+
     private Sound explosion = Gdx.audio.newSound(Gdx.files.internal("explosion.mp3"));
+    private Sound playerHurt = Gdx.audio.newSound(Gdx.files.internal("mikeHurt.mp3"));
+    private Sound enemyHurt = Gdx.audio.newSound(Gdx.files.internal("hectorHurt.mp3"));
 
     // HUD
 
@@ -133,9 +139,9 @@ public class GameScreen implements Screen {
 
         prepareHUD();
 
-        Music saulMusic = Gdx.audio.newMusic(Gdx.files.internal("saulMusic.mp3"));
-        Music saulSound = Gdx.audio.newMusic(Gdx.files.internal("saulSound.mp3"));
-        Music vineBoom = Gdx.audio.newMusic(Gdx.files.internal("vineBoom.mp3"));
+        saulMusic = Gdx.audio.newMusic(Gdx.files.internal("saulMusic.mp3"));
+        saulSound = Gdx.audio.newMusic(Gdx.files.internal("saulSound.mp3"));
+        vineBoom = Gdx.audio.newMusic(Gdx.files.internal("vineBoom.mp3"));
 
         saulMusic.setVolume(0.5f);
         saulSound.setVolume(0.6f);
@@ -235,11 +241,25 @@ public class GameScreen implements Screen {
 
         updateAndRenderHUD();
 
+        if (enemyScore >= 10 || playerScore >= 10) {
+
+            explodeLevel();
+
+        }
+
         batch.end();
 
     }
 
     private void detectInput(float deltaTime) {
+
+        // escape
+
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+
+            System.exit(0);
+
+        }
 
         // keyboard input
 
@@ -284,8 +304,48 @@ public class GameScreen implements Screen {
 
         }
 
-        moveEnemies(deltaTime);
+        // ENEMY PLAYER CONTROL, COMMENT OUT TO REMOVE FUNCTION
 
+        rightLimit = WORLD_WIDTH - enemyCharacter.boundingBox.getX() - enemyCharacter.boundingBox.getWidth();
+        leftLimit = -enemyCharacter.boundingBox.getX();
+
+        upLimit = WORLD_HEIGHT - enemyCharacter.boundingBox.getY() - enemyCharacter.boundingBox.getHeight();
+        downLimit = (float)WORLD_HEIGHT / 2 - enemyCharacter.boundingBox.getY();
+
+        if (Gdx.input.isKeyPressed(Input.Keys.D) && rightLimit > 0) {
+
+            float xChange = Math.min(enemyCharacter.movementSpeed * deltaTime, rightLimit);
+
+            enemyCharacter.translate(xChange, 0f);
+
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.A) && leftLimit < 0) {
+
+            float xChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, leftLimit);
+
+            enemyCharacter.translate(xChange, 0f);
+
+        }
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W) && upLimit > 0) {
+
+            float yChange = Math.min(enemyCharacter.movementSpeed * deltaTime, upLimit);
+
+            enemyCharacter.translate(0f, yChange);
+
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.S) && downLimit < 0) {
+
+            float yChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, leftLimit);
+
+            enemyCharacter.translate(0f, yChange);
+
+        }
+
+        //moveEnemies(deltaTime); ENEMY AI, UNCOMMENT TO FUNCTION
 
     }
 
@@ -461,6 +521,19 @@ public class GameScreen implements Screen {
 
     }
 
+    private void explodeLevel() {
+
+        explodeLevel = true;
+
+        playerCharacter.stop();
+        enemyCharacter.stop();
+
+        saulMusic.stop();
+        saulSound.stop();
+        vineBoom.stop();
+
+    }
+
     private void updateAndRenderHUD() {
 
         // top row
@@ -492,7 +565,8 @@ public class GameScreen implements Screen {
                 if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
 
                     explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 0.7f));
-                    explosion.play(0.75f);
+                    explosion.play(0.5f);
+                    enemyHurt.play(1f);
                     playerScore++;
 
                 }
@@ -517,7 +591,8 @@ public class GameScreen implements Screen {
                 if (playerCharacter.hitAndCheckDestroyed(projectile)) {
 
                     explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 0.7f));
-                    explosion.play(0.75f);
+                    explosion.play(0.5f);
+                    playerHurt.play(1f);
                     enemyScore++;
 
                 }
