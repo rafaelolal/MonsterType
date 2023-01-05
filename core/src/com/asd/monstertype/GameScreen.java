@@ -34,6 +34,7 @@ public class GameScreen implements Screen {
     //graphics
 
     private SpriteBatch batch;
+
     private TextureAtlas textureAtlas;
 
     private TextureRegion[] backgrounds;
@@ -52,7 +53,8 @@ public class GameScreen implements Screen {
 
     private final int WORLD_WIDTH = 1280;
     private final int WORLD_HEIGHT = 720;
-    private boolean explodeLevel = false;
+    private Rectangle worldBoundingBox = new Rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    private boolean levelEnded = false;
 
     // game objects
 
@@ -62,25 +64,35 @@ public class GameScreen implements Screen {
     private LinkedList<Projectile> enemyProjectileList;
     private LinkedList<Explosion> explosionList;
 
+    private Explosion bigExplosion;
+
     private int playerScore = 0;
     private int enemyScore = 0;
 
+    private int maxScore = 10;
 
     // audio
 
     private Music saulMusic;
     private Music saulSound;
     private Music vineBoom;
+    private Music endLevelTheme = Gdx.audio.newMusic(Gdx.files.internal("endLevelTheme.mp3"));
 
-    private Sound explosion = Gdx.audio.newSound(Gdx.files.internal("explosion.mp3"));
-    private Sound playerHurt = Gdx.audio.newSound(Gdx.files.internal("mikeHurt.mp3"));
-    private Sound enemyHurt = Gdx.audio.newSound(Gdx.files.internal("hectorHurt.mp3"));
+    private Sound explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.mp3"));
+    private Sound playerHurtSound = Gdx.audio.newSound(Gdx.files.internal("mikeHurt.mp3"));
+    private Sound enemyHurtSound = Gdx.audio.newSound(Gdx.files.internal("hectorHurt.mp3"));
+    private Sound bigExplosionSound = Gdx.audio.newSound(Gdx.files.internal("bigExplosion.mp3"));
 
     // HUD
 
     BitmapFont font1;
     BitmapFont font2;
     float hudVerticalMargin, hudLeftX, hudRightX, hudCenterX, hudRow1Y, hudRow2Y, hudSectionWidth;
+
+    // Font Generators
+
+    private FreeTypeFontGenerator fontGenerator;
+    private FreeTypeFontGenerator.FreeTypeFontParameter fontParameter;
 
     GameScreen() {
 
@@ -130,6 +142,8 @@ public class GameScreen implements Screen {
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
+        bigExplosion = new Explosion(explosionTexture, worldBoundingBox, 8f);
+
         playerProjectileList = new LinkedList<>();
         enemyProjectileList = new LinkedList<>();
 
@@ -137,15 +151,16 @@ public class GameScreen implements Screen {
 
         batch = new SpriteBatch();
 
+        initializeFonts();
         prepareHUD();
 
         saulMusic = Gdx.audio.newMusic(Gdx.files.internal("saulMusic.mp3"));
         saulSound = Gdx.audio.newMusic(Gdx.files.internal("saulSound.mp3"));
         vineBoom = Gdx.audio.newMusic(Gdx.files.internal("vineBoom.mp3"));
 
-        saulMusic.setVolume(0.5f);
-        saulSound.setVolume(0.6f);
-        vineBoom.setVolume(0.7f);
+        saulMusic.setVolume(0.7f);
+        saulSound.setVolume(0.8f);
+        vineBoom.setVolume(0.8f);
 
         saulMusic.setLooping(true);
         saulSound.setLooping(true);
@@ -157,7 +172,7 @@ public class GameScreen implements Screen {
 
     }
 
-    private void prepareHUD() {
+    private void initializeFonts() {
 
         // create bitmap fonts from file
 
@@ -175,6 +190,9 @@ public class GameScreen implements Screen {
 
         font2 = fontGenerator.generateFont(fontParameter);
 
+    }
+
+    private void prepareHUD() {
 
         // scale font
 
@@ -206,44 +224,49 @@ public class GameScreen implements Screen {
 
         detectInput(deltaTime);
 
-        // update characters
+        if (!levelEnded) {
 
-        playerCharacter.update(deltaTime);
-        enemyCharacter.update(deltaTime);
+            // update characters
 
-        // draw background
+            playerCharacter.update(deltaTime);
+            enemyCharacter.update(deltaTime);
 
+            // draw background
 
-        renderBackground(deltaTime);
+            renderBackground(deltaTime);
 
+            // draw playerCharacter
 
-        // draw playerCharacter
+            playerCharacter.draw(batch);
 
-        playerCharacter.draw(batch);
+            // draw enemyCharacter
 
-        // draw enemyCharacter
+            enemyCharacter.draw(batch);
 
-        enemyCharacter.draw(batch);
+            // projectiles
 
-        // projectiles
+            renderProjectiles(deltaTime);
 
-        renderProjectiles(deltaTime);
+            // detect collisions
 
-        // detect collisions
+            detectCollisions();
 
-        detectCollisions();
+            // explosions
 
-        // explosions
+            updateAndRenderExplosions(deltaTime);
 
-        updateAndRenderExplosions(deltaTime);
+            // hud
 
-        // hud
+            updateAndRenderHUD();
 
-        updateAndRenderHUD();
+       }
 
-        if (enemyScore >= 10 || playerScore >= 10) {
+        if (enemyScore >= maxScore || playerScore >= maxScore) {
 
-            explodeLevel();
+            bigExplosion.update(deltaTime);
+            bigExplosion.draw(batch);
+
+            endLevel();
 
         }
 
@@ -521,12 +544,21 @@ public class GameScreen implements Screen {
 
     }
 
-    private void explodeLevel() {
+    private void endLevel() {
 
-        explodeLevel = true;
+        levelEnded = true;
 
-        playerCharacter.stop();
-        enemyCharacter.stop();
+        font2.getData().setScale(1.5f);
+
+        if (playerScore > enemyScore) {
+
+            font2.draw(batch, "PLAYER ONE WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2, (float)WORLD_WIDTH * 1/2, Align.center, false);
+
+        } else {
+
+            font2.draw(batch, "PLAYER TWO WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2, (float)WORLD_WIDTH * 1/2, Align.center, false);
+
+        }
 
         saulMusic.stop();
         saulSound.stop();
@@ -539,7 +571,7 @@ public class GameScreen implements Screen {
         // top row
 
         font1.draw(batch, "Player One Score", hudLeftX, hudRow1Y, hudSectionWidth, Align.left, false);
-        font1.draw(batch, "Enemy Score", hudRightX, hudRow1Y, hudSectionWidth, Align.right, false);
+        font1.draw(batch, "Player Two Score", hudRightX, hudRow1Y, hudSectionWidth, Align.right, false);
 
         // second row
 
@@ -565,9 +597,20 @@ public class GameScreen implements Screen {
                 if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
 
                     explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 0.7f));
-                    explosion.play(0.5f);
-                    enemyHurt.play(1f);
                     playerScore++;
+
+                    if (playerScore < maxScore - 1) {
+
+                        explosionSound.play(0.5f);
+                        enemyHurtSound.play(1f);
+
+                    } else {
+
+                        bigExplosionSound.play(1f);
+                        endLevelTheme.setVolume(1f);
+                        endLevelTheme.play();
+
+                    }
 
                 }
 
@@ -591,9 +634,21 @@ public class GameScreen implements Screen {
                 if (playerCharacter.hitAndCheckDestroyed(projectile)) {
 
                     explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 0.7f));
-                    explosion.play(0.5f);
-                    playerHurt.play(1f);
                     enemyScore++;
+
+                    if (enemyScore < maxScore - 1) {
+
+                        explosionSound.play(0.5f);
+                        playerHurtSound.play(1f);
+
+
+                    } else {
+
+                        bigExplosionSound.play(1f);
+                        endLevelTheme.setVolume(1f);
+                        endLevelTheme.play();
+
+                    }
 
                 }
 
