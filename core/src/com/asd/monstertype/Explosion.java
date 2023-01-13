@@ -13,22 +13,22 @@ public class Explosion {
 
     private Rectangle boundingBox;
 
-    Explosion(Texture texture, Rectangle boundingBox, float animationTime) {
+    Explosion(Texture texture, Rectangle boundingBox, int tileAmount, float animationTime) {
 
         this.boundingBox = boundingBox;
 
         // split explosion texture
 
-        TextureRegion[][] textureRegion2D = TextureRegion.split(texture, texture.getWidth() / 4, texture.getHeight() / 4);
+        TextureRegion[][] textureRegion2D = TextureRegion.split(texture, texture.getWidth() / tileAmount, texture.getHeight() / tileAmount);
 
         // convert to 1D array
 
-        TextureRegion[] textureRegion1D = new TextureRegion[16];
+        TextureRegion[] textureRegion1D = new TextureRegion[tileAmount * tileAmount];
 
         int index = 0;
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < tileAmount; i++) {
+            for (int j = 0; j < tileAmount; j++) {
 
                 textureRegion1D[index] = textureRegion2D[i][j];
                 index++;
@@ -37,7 +37,7 @@ public class Explosion {
 
         }
 
-        explosionAnimation = new Animation<TextureRegion>(animationTime / 16, textureRegion1D);
+        explosionAnimation = new Animation<TextureRegion>(animationTime / (tileAmount * tileAmount), textureRegion1D);
 
     }
 

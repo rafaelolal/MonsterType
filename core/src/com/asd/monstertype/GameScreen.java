@@ -41,6 +41,7 @@ public class GameScreen implements Screen {
     private float backgroundHeight;
 
     private Texture explosionTexture;
+    private Texture bigExplosionTexture;
 
     private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion, playerProjectileTextureRegion, enemyProjectileTextureRegion;
 
@@ -129,6 +130,7 @@ public class GameScreen implements Screen {
         enemyProjectileTextureRegion = textureAtlas.findRegion("hectorBell");
 
         explosionTexture = new Texture("explosion.png");
+        bigExplosionTexture = new Texture("bigExplosion.png");
 
         // game objects set up
 
@@ -142,7 +144,7 @@ public class GameScreen implements Screen {
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
-        bigExplosion = new Explosion(explosionTexture, worldBoundingBox, 8f);
+        bigExplosion = new Explosion(bigExplosionTexture, worldBoundingBox, 5, 3f);
 
         playerProjectileList = new LinkedList<>();
         enemyProjectileList = new LinkedList<>();
@@ -596,17 +598,17 @@ public class GameScreen implements Screen {
                 // collision with enemy character
                 if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 0.7f));
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 4,0.7f));
                     playerScore++;
 
-                    if (playerScore < maxScore - 1) {
+                    if (playerScore < maxScore) {
 
                         explosionSound.play(0.5f);
                         enemyHurtSound.play(1f);
 
                     } else {
 
-                        bigExplosionSound.play(1f);
+                        bigExplosionSound.play(0.7f);
                         endLevelTheme.setVolume(1f);
                         endLevelTheme.play();
 
@@ -633,10 +635,10 @@ public class GameScreen implements Screen {
                 // collision with player character
                 if (playerCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 0.7f));
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 4,0.7f));
                     enemyScore++;
 
-                    if (enemyScore < maxScore - 1) {
+                    if (enemyScore < maxScore) {
 
                         explosionSound.play(0.5f);
                         playerHurtSound.play(1f);
@@ -644,7 +646,7 @@ public class GameScreen implements Screen {
 
                     } else {
 
-                        bigExplosionSound.play(1f);
+                        bigExplosionSound.play(0.7f);
                         endLevelTheme.setVolume(1f);
                         endLevelTheme.play();
 
