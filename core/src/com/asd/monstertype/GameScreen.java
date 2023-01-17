@@ -24,7 +24,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 
 
-public class GameScreen implements Screen {
+public class GameScreen extends GameClass implements Screen {
 
     //screen
 
@@ -138,13 +138,11 @@ public class GameScreen implements Screen {
                 WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
                 playerCharacterTextureRegion, playerProjectileTextureRegion);
 
-        //playerCharacter.changeProjectileCharacteristics(playerCharacter.projectileHeight, playerCharacter.projectileWidth, playerCharacter.projectileMovementSpeed, 0.1f);
-
         enemyCharacter = new EnemyCharacter(500, 200, 140,
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
-        bigExplosion = new Explosion(bigExplosionTexture, worldBoundingBox, 5, 3f);
+        bigExplosion = new Explosion(explosionTexture, worldBoundingBox, 10, 5f);
 
         playerProjectileList = new LinkedList<>();
         enemyProjectileList = new LinkedList<>();
@@ -277,6 +275,13 @@ public class GameScreen implements Screen {
     }
 
     private void detectInput(float deltaTime) {
+
+        if (Gdx.input.isKeyPressed(Input.Keys.P)) {
+
+            newScreen();
+
+        }
+
 
         // escape
 
@@ -554,11 +559,11 @@ public class GameScreen implements Screen {
 
         if (playerScore > enemyScore) {
 
-            font2.draw(batch, "PLAYER ONE WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2, (float)WORLD_WIDTH * 1/2, Align.center, false);
+            font2.draw(batch, "PLAYER ONE WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
 
         } else {
 
-            font2.draw(batch, "PLAYER TWO WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2, (float)WORLD_WIDTH * 1/2, Align.center, false);
+            font2.draw(batch, "PLAYER TWO WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
 
         }
 
@@ -598,7 +603,7 @@ public class GameScreen implements Screen {
                 // collision with enemy character
                 if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 4,0.7f));
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 7,1f));
                     playerScore++;
 
                     if (playerScore < maxScore) {
@@ -635,7 +640,7 @@ public class GameScreen implements Screen {
                 // collision with player character
                 if (playerCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 4,0.7f));
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 7,1f));
                     enemyScore++;
 
                     if (enemyScore < maxScore) {
@@ -673,10 +678,14 @@ public class GameScreen implements Screen {
     @Override
     public void pause() {
 
+        super.pause();
+
     }
 
     @Override
     public void resume() {
+
+        super.resume();
 
     }
 
@@ -688,10 +697,13 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
 
+        super.dispose();
+
     }
 
     @Override
     public void show() {
+
 
     }
 

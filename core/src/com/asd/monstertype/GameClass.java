@@ -18,6 +18,13 @@ public class GameClass extends Game {
 
 	}
 
+	public void newScreen() {
+
+		gameScreen = new GameScreen();
+		this.setScreen(gameScreen);
+
+	}
+
 	@Override
 	public void dispose() {
 		gameScreen.dispose();
@@ -31,6 +38,13 @@ public class GameClass extends Game {
 	@Override
 	public void resize(int width, int height) {
 		gameScreen.resize(width, height);
+	}
+
+	@Override
+	public void pause() {
+
+		gameScreen.pause();
+
 	}
 
 }
