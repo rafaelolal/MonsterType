@@ -8,26 +8,60 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameClass extends Game {
 
-	GameScreen gameScreen;
+	protected GameScreen gameScreen;
+	protected MainMenuScreen mainMenuScreen;
+
+	public final static int MENU = 0;
+	public final static int GAME = 1;
 
 	@Override
 	public void create() {
 
-		gameScreen = new GameScreen();
-		setScreen(gameScreen);
+		mainMenuScreen = new MainMenuScreen(this);
+		setScreen(mainMenuScreen);
+
+		//gameScreen = new GameScreen(this, false);
+		//setScreen(gameScreen);
 
 	}
 
 	public void newScreen() {
 
-		gameScreen = new GameScreen();
-		this.setScreen(gameScreen);
+		dispose();
+
+	}
+
+	public void changeScreen(int screen) {
+
+		switch(screen) {
+
+			case MENU:
+
+				if (mainMenuScreen == null) {
+
+					mainMenuScreen = new MainMenuScreen(this);
+					this.setScreen(mainMenuScreen);
+					break;
+
+				}
+
+			case GAME:
+
+				if (gameScreen == null) {
+
+					gameScreen = new GameScreen(this, false);
+					this.setScreen(gameScreen);
+					break;
+
+				}
+
+		}
 
 	}
 
 	@Override
 	public void dispose() {
-		gameScreen.dispose();
+		super.dispose();
 	}
 
 	@Override

@@ -26,6 +26,8 @@ import java.util.Locale;
 
 public class GameScreen extends GameClass implements Screen {
 
+    private GameClass parent;
+
     //screen
 
     private Camera camera;
@@ -56,6 +58,8 @@ public class GameScreen extends GameClass implements Screen {
     private final int WORLD_HEIGHT = 720;
     private Rectangle worldBoundingBox = new Rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     private boolean levelEnded = false;
+    private boolean playWithAI;
+    private String enemyName;
 
     // game objects
 
@@ -95,7 +99,12 @@ public class GameScreen extends GameClass implements Screen {
     private FreeTypeFontGenerator fontGenerator;
     private FreeTypeFontGenerator.FreeTypeFontParameter fontParameter;
 
-    GameScreen() {
+    GameScreen(GameClass gameClass, boolean playWithAI) {
+
+        // GameClass Setup
+
+        parent = gameClass;
+        this.playWithAI = playWithAI;
 
         camera = new OrthographicCamera();
         viewport = new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
@@ -151,8 +160,22 @@ public class GameScreen extends GameClass implements Screen {
 
         batch = new SpriteBatch();
 
+        // FONTS & HUD
+
+        if (playWithAI) {
+
+            enemyName = "Enemy";
+
+        } else {
+
+            enemyName = "Player Two";
+
+        }
+
         initializeFonts();
         prepareHUD();
+
+        // AUDIO
 
         saulMusic = Gdx.audio.newMusic(Gdx.files.internal("saulMusic.mp3"));
         saulSound = Gdx.audio.newMusic(Gdx.files.internal("saulSound.mp3"));
@@ -278,7 +301,7 @@ public class GameScreen extends GameClass implements Screen {
 
         if (Gdx.input.isKeyPressed(Input.Keys.P)) {
 
-            newScreen();
+            //
 
         }
 
@@ -334,48 +357,55 @@ public class GameScreen extends GameClass implements Screen {
 
         }
 
-        // ENEMY PLAYER CONTROL, COMMENT OUT TO REMOVE FUNCTION
+        if (playWithAI) {
 
-        rightLimit = WORLD_WIDTH - enemyCharacter.boundingBox.getX() - enemyCharacter.boundingBox.getWidth();
-        leftLimit = -enemyCharacter.boundingBox.getX();
+            // AI
+            moveEnemies(deltaTime);
 
-        upLimit = WORLD_HEIGHT - enemyCharacter.boundingBox.getY() - enemyCharacter.boundingBox.getHeight();
-        downLimit = (float)WORLD_HEIGHT / 2 - enemyCharacter.boundingBox.getY();
+        } else {
 
-        if (Gdx.input.isKeyPressed(Input.Keys.D) && rightLimit > 0) {
+            // ENEMY PLAYER CONTROL
 
-            float xChange = Math.min(enemyCharacter.movementSpeed * deltaTime, rightLimit);
+            rightLimit = WORLD_WIDTH - enemyCharacter.boundingBox.getX() - enemyCharacter.boundingBox.getWidth();
+            leftLimit = -enemyCharacter.boundingBox.getX();
 
-            enemyCharacter.translate(xChange, 0f);
+            upLimit = WORLD_HEIGHT - enemyCharacter.boundingBox.getY() - enemyCharacter.boundingBox.getHeight();
+            downLimit = (float)WORLD_HEIGHT / 2 - enemyCharacter.boundingBox.getY();
+
+            if (Gdx.input.isKeyPressed(Input.Keys.D) && rightLimit > 0) {
+
+                float xChange = Math.min(enemyCharacter.movementSpeed * deltaTime, rightLimit);
+
+                enemyCharacter.translate(xChange, 0f);
+
+            }
+
+            if (Gdx.input.isKeyPressed(Input.Keys.A) && leftLimit < 0) {
+
+                float xChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, leftLimit);
+
+                enemyCharacter.translate(xChange, 0f);
+
+            }
+
+
+            if (Gdx.input.isKeyPressed(Input.Keys.W) && upLimit > 0) {
+
+                float yChange = Math.min(enemyCharacter.movementSpeed * deltaTime, upLimit);
+
+                enemyCharacter.translate(0f, yChange);
+
+            }
+
+            if (Gdx.input.isKeyPressed(Input.Keys.S) && downLimit < 0) {
+
+                float yChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, leftLimit);
+
+                enemyCharacter.translate(0f, yChange);
+
+            }
 
         }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A) && leftLimit < 0) {
-
-            float xChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, leftLimit);
-
-            enemyCharacter.translate(xChange, 0f);
-
-        }
-
-
-        if (Gdx.input.isKeyPressed(Input.Keys.W) && upLimit > 0) {
-
-            float yChange = Math.min(enemyCharacter.movementSpeed * deltaTime, upLimit);
-
-            enemyCharacter.translate(0f, yChange);
-
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.S) && downLimit < 0) {
-
-            float yChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, leftLimit);
-
-            enemyCharacter.translate(0f, yChange);
-
-        }
-
-        //moveEnemies(deltaTime); ENEMY AI, UNCOMMENT TO FUNCTION
 
     }
 
@@ -578,7 +608,8 @@ public class GameScreen extends GameClass implements Screen {
         // top row
 
         font1.draw(batch, "Player One Score", hudLeftX, hudRow1Y, hudSectionWidth, Align.left, false);
-        font1.draw(batch, "Player Two Score", hudRightX, hudRow1Y, hudSectionWidth, Align.right, false);
+
+        font1.draw(batch, enemyName + " Score", hudRightX, hudRow1Y, hudSectionWidth, Align.right, false);
 
         // second row
 
@@ -695,15 +726,16 @@ public class GameScreen extends GameClass implements Screen {
     }
 
     @Override
-    public void dispose() {
+    public void show() {
 
-        super.dispose();
 
     }
 
     @Override
-    public void show() {
+    public void dispose() {
 
+        batch.dispose();
+        super.dispose();
 
     }
 
