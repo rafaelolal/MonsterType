@@ -2,6 +2,7 @@ package com.asd.monstertype;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -31,8 +32,9 @@ public class GameClass extends Game {
 
 			case MENU:
 
-				if (mainMenuScreen == null) {
+				if (mainMenuScreen != null) {
 
+					gameScreen = null;
 					mainMenuScreen = new MainMenuScreen(this);
 					this.setScreen(mainMenuScreen);
 					break;

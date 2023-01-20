@@ -166,8 +166,10 @@ public class MainMenuScreen implements Screen {
     @Override
     public void dispose() {
 
-        batch.dispose();
-        // Assets.manager.unload(Assets.mainMenuBackground); TO UNLOAD BACKGROUND WHEN REPLACED
+        //batch.dispose();
+        font1.dispose();
+        font2.dispose();
+        //Assets.manager.unload(Assets.mainMenuBackground);
 
     }
 

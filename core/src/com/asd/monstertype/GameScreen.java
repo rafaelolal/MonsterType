@@ -25,7 +25,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 
 
-public class GameScreen extends GameClass implements Screen {
+public class GameScreen implements Screen {
 
     private GameClass parent;
 
@@ -301,6 +301,20 @@ public class GameScreen extends GameClass implements Screen {
     }
 
     private void detectInput(float deltaTime) {
+
+        // play again
+
+        if (levelEnded) {
+
+            if (Gdx.input.isKeyPressed(Input.Keys.P)) {
+
+                dispose();
+                parent.changeScreen(GameClass.MENU);
+                //parent.gameScreen = null;
+
+            }
+
+        }
 
         // escape
 
@@ -597,6 +611,10 @@ public class GameScreen extends GameClass implements Screen {
         saulSound.stop();
         vineBoom.stop();
 
+        font2.getData().setScale(0.7f);
+        font2.draw(batch, "Press P key to play again", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/4 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
+
+
     }
 
     private void updateAndRenderHUD() {
@@ -726,7 +744,7 @@ public class GameScreen extends GameClass implements Screen {
     @Override
     public void dispose() {
 
-        batch.dispose();
+        //batch.dispose();
 
     }
 

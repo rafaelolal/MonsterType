@@ -13,7 +13,7 @@ public class Assets {
 
     // textures
 
-    public static final String mainMenuBackground = "images.png";
+    public static final String mainMenuBackground = "walter.png";
     public static final String textureAtlas = "images.atlas";
     public static final String explosionTexture = "explosion.png";
 
