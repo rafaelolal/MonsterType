@@ -17,17 +17,11 @@ public class GameClass extends Game {
 	@Override
 	public void create() {
 
+		Assets.load();
+		Assets.manager.finishLoading();
+
 		mainMenuScreen = new MainMenuScreen(this);
 		setScreen(mainMenuScreen);
-
-		//gameScreen = new GameScreen(this, false);
-		//setScreen(gameScreen);
-
-	}
-
-	public void newScreen() {
-
-		dispose();
 
 	}
 
@@ -49,9 +43,19 @@ public class GameClass extends Game {
 
 				if (gameScreen == null) {
 
-					gameScreen = new GameScreen(this, false);
-					this.setScreen(gameScreen);
-					break;
+					if (mainMenuScreen.getPlayWithAI()) {
+
+						gameScreen = new GameScreen(this, true);
+						this.setScreen(gameScreen);
+						break;
+
+					} else {
+
+						gameScreen = new GameScreen(this, false);
+						this.setScreen(gameScreen);
+						break;
+
+					}
 
 				}
 
@@ -61,7 +65,10 @@ public class GameClass extends Game {
 
 	@Override
 	public void dispose() {
+
 		super.dispose();
+		Assets.dispose();
+
 	}
 
 	@Override
@@ -71,13 +78,14 @@ public class GameClass extends Game {
 
 	@Override
 	public void resize(int width, int height) {
-		gameScreen.resize(width, height);
+
+
 	}
 
 	@Override
 	public void pause() {
 
-		gameScreen.pause();
+
 
 	}
 

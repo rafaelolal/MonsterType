@@ -3,6 +3,7 @@ package com.asd.monstertype;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
@@ -33,17 +34,16 @@ public class GameScreen extends GameClass implements Screen {
     private Camera camera;
     private Viewport viewport;
 
+    // assets
+
+    AssetManager manager = new AssetManager();
+
     //graphics
 
     private SpriteBatch batch;
 
-    private TextureAtlas textureAtlas;
-
     private TextureRegion[] backgrounds;
     private float backgroundHeight;
-
-    private Texture explosionTexture;
-    private Texture bigExplosionTexture;
 
     private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion, playerProjectileTextureRegion, enemyProjectileTextureRegion;
 
@@ -81,12 +81,12 @@ public class GameScreen extends GameClass implements Screen {
     private Music saulMusic;
     private Music saulSound;
     private Music vineBoom;
-    private Music endLevelTheme = Gdx.audio.newMusic(Gdx.files.internal("endLevelTheme.mp3"));
+    private Music endLevelTheme;
 
-    private Sound explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.mp3"));
-    private Sound playerHurtSound = Gdx.audio.newSound(Gdx.files.internal("mikeHurt.mp3"));
-    private Sound enemyHurtSound = Gdx.audio.newSound(Gdx.files.internal("hectorHurt.mp3"));
-    private Sound bigExplosionSound = Gdx.audio.newSound(Gdx.files.internal("bigExplosion.mp3"));
+    private Sound explosionSound;
+    private Sound playerHurtSound;
+    private Sound enemyHurtSound;
+    private Sound bigExplosionSound;
 
     // HUD
 
@@ -111,35 +111,30 @@ public class GameScreen extends GameClass implements Screen {
 
         // texture atlas setup
 
-        textureAtlas = new TextureAtlas("images.atlas");
-
         // initialize backgrounds
 
         backgrounds = new TextureRegion[8];
 
-        backgrounds[0] = textureAtlas.findRegion("gameBackground(TEMP)");
-        backgrounds[1] = textureAtlas.findRegion("walterWhite");
-        backgrounds[2] = textureAtlas.findRegion("jessePinkman");
-        backgrounds[3] = textureAtlas.findRegion("saulGoodman");
+        backgrounds[0] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("gameBackground(TEMP)");
+        backgrounds[1] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("walterWhite");
+        backgrounds[2] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("jessePinkman");
+        backgrounds[3] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("saulGoodman");
 
-        backgrounds[4] = textureAtlas.findRegion("rain");
-        backgrounds[5] = textureAtlas.findRegion("rain");
-        backgrounds[6] = textureAtlas.findRegion("rain");
-        backgrounds[7] = textureAtlas.findRegion("rain");
+        backgrounds[4] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
+        backgrounds[5] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
+        backgrounds[6] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
+        backgrounds[7] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
 
         backgroundHeight = WORLD_HEIGHT * 2;
         backgroundMaxScrollingSpeed =  (float)(WORLD_HEIGHT) / 2;
 
         // initialize texture regions
 
-        playerCharacterTextureRegion = textureAtlas.findRegion("mikeEhrm");
-        enemyCharacterTextureRegion = textureAtlas.findRegion("hectorSalamanca");
+        playerCharacterTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("mikeEhrm");
+        enemyCharacterTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hectorSalamanca");
 
-        playerProjectileTextureRegion = textureAtlas.findRegion("hectorBell");
-        enemyProjectileTextureRegion = textureAtlas.findRegion("hectorBell");
-
-        explosionTexture = new Texture("explosion.png");
-        bigExplosionTexture = new Texture("bigExplosion.png");
+        playerProjectileTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hectorBell");
+        enemyProjectileTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hectorBell");
 
         // game objects set up
 
@@ -151,7 +146,7 @@ public class GameScreen extends GameClass implements Screen {
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
-        bigExplosion = new Explosion(explosionTexture, worldBoundingBox, 10, 5f);
+        bigExplosion = new Explosion(Assets.manager.get(Assets.explosionTexture, Texture.class), worldBoundingBox, 10, 5f);
 
         playerProjectileList = new LinkedList<>();
         enemyProjectileList = new LinkedList<>();
@@ -175,11 +170,12 @@ public class GameScreen extends GameClass implements Screen {
         initializeFonts();
         prepareHUD();
 
-        // AUDIO
+        // MUSIC
 
-        saulMusic = Gdx.audio.newMusic(Gdx.files.internal("saulMusic.mp3"));
-        saulSound = Gdx.audio.newMusic(Gdx.files.internal("saulSound.mp3"));
-        vineBoom = Gdx.audio.newMusic(Gdx.files.internal("vineBoom.mp3"));
+        saulMusic = Assets.manager.get(Assets.saulMusic, Music.class);
+        saulSound = Assets.manager.get(Assets.saulSound, Music.class);
+        vineBoom = Assets.manager.get(Assets.vineBoom, Music.class);
+        endLevelTheme = Assets.manager.get(Assets.endLevelTheme, Music.class);
 
         saulMusic.setVolume(0.7f);
         saulSound.setVolume(0.8f);
@@ -193,14 +189,21 @@ public class GameScreen extends GameClass implements Screen {
         saulSound.play();
         vineBoom.play();
 
+        // SOUNDS
+
+        explosionSound = Assets.manager.get(Assets.explosionSound, Sound.class);
+        playerHurtSound = Assets.manager.get(Assets.mikeHurt, Sound.class);
+        enemyHurtSound = Assets.manager.get(Assets.hectorHurt, Sound.class);
+        bigExplosionSound = Assets.manager.get(Assets.bigExplosionSound, Sound.class);
+
     }
 
     private void initializeFonts() {
 
         // create bitmap fonts from file
 
-        FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("BreakingBad.otf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("BreakingBad.otf"));
+        fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 
         fontParameter.size = 80;
         fontParameter.borderWidth = 4;
@@ -298,13 +301,6 @@ public class GameScreen extends GameClass implements Screen {
     }
 
     private void detectInput(float deltaTime) {
-
-        if (Gdx.input.isKeyPressed(Input.Keys.P)) {
-
-            //
-
-        }
-
 
         // escape
 
@@ -634,7 +630,7 @@ public class GameScreen extends GameClass implements Screen {
                 // collision with enemy character
                 if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 7,1f));
+                    explosionList.add(new Explosion(Assets.manager.get(Assets.explosionTexture, Texture.class), new Rectangle(enemyCharacter.boundingBox), 7,1f));
                     playerScore++;
 
                     if (playerScore < maxScore) {
@@ -671,7 +667,7 @@ public class GameScreen extends GameClass implements Screen {
                 // collision with player character
                 if (playerCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 7,1f));
+                    explosionList.add(new Explosion(Assets.manager.get(Assets.explosionTexture, Texture.class), new Rectangle(playerCharacter.boundingBox), 7,1f));
                     enemyScore++;
 
                     if (enemyScore < maxScore) {
@@ -709,14 +705,10 @@ public class GameScreen extends GameClass implements Screen {
     @Override
     public void pause() {
 
-        super.pause();
-
     }
 
     @Override
     public void resume() {
-
-        super.resume();
 
     }
 
@@ -735,7 +727,6 @@ public class GameScreen extends GameClass implements Screen {
     public void dispose() {
 
         batch.dispose();
-        super.dispose();
 
     }
 
