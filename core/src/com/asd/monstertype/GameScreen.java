@@ -3,6 +3,7 @@ package com.asd.monstertype;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -16,7 +17,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -25,18 +34,18 @@ import java.util.ListIterator;
 import java.util.Locale;
 
 
-public class GameScreen implements Screen {
+public class GameScreen extends ScreenAdapter {
 
     private GameClass parent;
 
-    //screen
+    // screen
 
     private Camera camera;
     private Viewport viewport;
+    private Stage stage;
+    private Skin skin;
 
-    // assets
-
-    AssetManager manager = new AssetManager();
+    private Table mainTable;
 
     //graphics
 
@@ -99,15 +108,12 @@ public class GameScreen implements Screen {
     private FreeTypeFontGenerator fontGenerator;
     private FreeTypeFontGenerator.FreeTypeFontParameter fontParameter;
 
-    GameScreen(GameClass gameClass, boolean playWithAI) {
+    public GameScreen(GameClass gameClass, boolean playWithAI) {
 
         // GameClass Setup
 
         parent = gameClass;
         this.playWithAI = playWithAI;
-
-        camera = new OrthographicCamera();
-        viewport = new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
 
         // texture atlas setup
 
@@ -153,8 +159,6 @@ public class GameScreen implements Screen {
 
         explosionList = new LinkedList<>();
 
-        batch = new SpriteBatch();
-
         // FONTS & HUD
 
         if (playWithAI) {
@@ -169,6 +173,8 @@ public class GameScreen implements Screen {
 
         initializeFonts();
         prepareHUD();
+
+        skin = Assets.manager.get(Assets.SKIN);
 
         // MUSIC
 
@@ -195,6 +201,9 @@ public class GameScreen implements Screen {
         playerHurtSound = Assets.manager.get(Assets.mikeHurt, Sound.class);
         enemyHurtSound = Assets.manager.get(Assets.hectorHurt, Sound.class);
         bigExplosionSound = Assets.manager.get(Assets.bigExplosionSound, Sound.class);
+
+
+        batch = new SpriteBatch();
 
     }
 
@@ -259,7 +268,7 @@ public class GameScreen implements Screen {
 
             // draw background
 
-            renderBackground(deltaTime);
+            renderBackgrounds(deltaTime);
 
             // draw playerCharacter
 
@@ -285,7 +294,7 @@ public class GameScreen implements Screen {
 
             updateAndRenderHUD();
 
-       }
+        }
 
         if (enemyScore >= maxScore || playerScore >= maxScore) {
 
@@ -296,26 +305,23 @@ public class GameScreen implements Screen {
 
         }
 
+        stage.act();
+        stage.draw();
+
         batch.end();
 
     }
 
     private void detectInput(float deltaTime) {
 
-        // play again
+        if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
 
-        if (levelEnded) {
-
-            if (Gdx.input.isKeyPressed(Input.Keys.P)) {
-
-                dispose();
-                parent.changeScreen(GameClass.MENU);
-                //parent.gameScreen = null;
-
-            }
+            dispose();
+            parent.gameScreen = null;
+            parent.changeScreen(GameClass.MENU);
+            //parent.gameScreen = null;
 
         }
-
         // escape
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -456,7 +462,7 @@ public class GameScreen implements Screen {
 
     }
 
-    private void renderBackground(float deltaTime) {
+    private void renderBackgrounds(float deltaTime) {
 
         backgroundOffsets[0] += (deltaTime * backgroundMaxScrollingSpeed * 1/8);
         backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * 1);
@@ -607,13 +613,23 @@ public class GameScreen implements Screen {
 
         }
 
+        font2.getData().setScale(0.7f);
+        font2.draw(batch, "Press ENTER to play again", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/4 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
+
         saulMusic.stop();
         saulSound.stop();
         vineBoom.stop();
 
-        font2.getData().setScale(0.7f);
-        font2.draw(batch, "Press P key to play again", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/4 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
-
+        /*addButton("Play Again").addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent even, float x, float y)
+            {
+                dispose();
+                parent.gameScreen = null;
+                parent.changeScreen(GameClass.MENU);
+                //parent.gameScreen = null;
+            }
+        });*/
 
     }
 
@@ -658,8 +674,8 @@ public class GameScreen implements Screen {
 
                     } else {
 
-                        bigExplosionSound.play(0.7f);
-                        endLevelTheme.setVolume(1f);
+                        bigExplosionSound.play(1.7f);
+                        endLevelTheme.setVolume(2f);
                         endLevelTheme.play();
 
                     }
@@ -696,8 +712,8 @@ public class GameScreen implements Screen {
 
                     } else {
 
-                        bigExplosionSound.play(0.7f);
-                        endLevelTheme.setVolume(1f);
+                        bigExplosionSound.play(1.7f);
+                        endLevelTheme.setVolume(2f);
                         endLevelTheme.play();
 
                     }
@@ -713,6 +729,32 @@ public class GameScreen implements Screen {
     }
 
     @Override
+    public void show() {
+
+        camera = new OrthographicCamera();
+        viewport = new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
+
+        stage = new Stage(viewport);
+
+        mainTable = new Table();
+        mainTable.setFillParent(true);
+
+        stage.addActor(mainTable);
+
+        mainTable.setPosition(0, -200);
+
+    }
+
+    private TextButton addButton(String name) {
+
+        TextButton button = new TextButton(name, skin);
+        mainTable.add(button).width(1000).padBottom(10);
+        mainTable.row();
+        return button;
+
+    }
+
+    @Override
     public void resize(int width, int height) {
 
         viewport.update(width, height, true);
@@ -721,30 +763,32 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void show() {
-
-
-    }
-
-    @Override
     public void dispose() {
 
+        disposeAudio();
+        disposeFonts();
+
         //batch.dispose();
+
+    }
+
+    private void disposeAudio() {
+
+        // MUSIC
+
+        saulMusic.dispose();
+        saulSound.dispose();
+        vineBoom.dispose();
+        endLevelTheme.dispose();
+
+    }
+
+    public void disposeFonts() {
+
+        font1.dispose();
+        font2.dispose();
+
+        fontGenerator.dispose();
 
     }
 

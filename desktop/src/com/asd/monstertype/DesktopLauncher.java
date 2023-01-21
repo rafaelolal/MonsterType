@@ -12,8 +12,8 @@ public class DesktopLauncher {
 
 		config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
 
-		//config.setForegroundFPS(60);
-		//config.setTitle("Monster Type");
+		config.setForegroundFPS(60);
+		config.setTitle("Monster Type");
 
 		new Lwjgl3Application(new GameClass(), config);
 
