@@ -16,11 +16,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.*;
@@ -31,7 +35,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 
 
-public class MainMenuScreen extends ScreenAdapter {
+public class SettingsScreen extends ScreenAdapter {
 
     private GameClass parent;
 
@@ -60,22 +64,21 @@ public class MainMenuScreen extends ScreenAdapter {
 
     private boolean playWithAI;
 
-    private boolean disposeMusic;
-
     // HUD
 
     BitmapFont font1;
+    BitmapFont font2;
+
+    private final int VOLUME = 0;
+
+    Slider volumeSlider;
 
     // font Generators
 
     private FreeTypeFontGenerator fontGenerator;
     private FreeTypeFontGenerator.FreeTypeFontParameter fontParameter;
 
-    // audio
-
-    private Music mainMenuMusic;
-
-    public MainMenuScreen(GameClass gameClass) {
+    public SettingsScreen(GameClass gameClass) {
 
         // GameClass Setup
 
@@ -97,14 +100,6 @@ public class MainMenuScreen extends ScreenAdapter {
 
         skin = Assets.manager.get(Assets.SKIN);
 
-        // audio
-
-        mainMenuMusic = Assets.manager.get(Assets.mainMenuMusic, Music.class);
-
-        mainMenuMusic.setVolume(0.7f * parent.volume);
-        mainMenuMusic.play();
-
-
         batch = new SpriteBatch();
 
     }
@@ -125,6 +120,12 @@ public class MainMenuScreen extends ScreenAdapter {
 
         font1.getData().setScale(1.5f);
 
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("EdgeFont.otf"));
+
+        font2 = fontGenerator.generateFont(fontParameter);
+
+        font2.getData().setScale(0.5f);
+
     }
 
     @Override
@@ -136,7 +137,9 @@ public class MainMenuScreen extends ScreenAdapter {
 
         renderBackgrounds(deltaTime);
 
-        font1.draw(batch, "Breaking Bad Gme", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 2/3 + font1.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
+        font1.draw(batch, "Settings", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 3/4 + font1.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
+
+        font2.draw(batch, "Volume", volumeSlider.getX() - 500, volumeSlider.getY() + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
 
         stage.act();
         stage.draw();
@@ -204,38 +207,26 @@ public class MainMenuScreen extends ScreenAdapter {
 
         stage.addActor(mainTable);
 
-        mainTable.setPosition(0, -100);
+        mainTable.setPosition(0, 25);
 
-        addTextButton("Play With AI").addListener(new ClickListener() {
+        addSlider(VOLUME).addListener(new ChangeListener() {
             @Override
-            public void clicked(InputEvent even, float x, float y)
+            public void changed(ChangeEvent event, Actor actor)
             {
-                playWithAI = true;
-                disposeMusic = true;
-                dispose();
-                parent.changeScreen(GameClass.GAME);
-            }
-        });
-        addTextButton("Play With Two Players").addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent even, float x, float y)
-            {
-                playWithAI = false;
-                disposeMusic = true;
-                dispose();
-                parent.changeScreen(GameClass.GAME);
-            }
-        });
-        addTextButton("Settings").addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent even, float x, float y)
-            {
-                disposeMusic = false;
-                dispose();
-                parent.changeScreen(GameClass.SETTINGS);
+
+                parent.volume = volumeSlider.getValue();
+
             }
         });
 
+        addTextButton("Back").addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent even, float x, float y)
+            {
+                dispose();
+                parent.changeScreen(GameClass.MENU);
+            }
+        });
 
         Gdx.input.setInputProcessor(stage);
 
@@ -245,9 +236,26 @@ public class MainMenuScreen extends ScreenAdapter {
 
         TextButton button = new TextButton(name, skin);
 
-        mainTable.add(button).width(700).height(50).padBottom(25);
+        mainTable.add(button).width(700).height(50).padBottom(25).setActorY(400);
         mainTable.row();
         return button;
+
+    }
+
+    private Slider addSlider(int slider) {
+
+        if (slider == VOLUME) {
+
+            volumeSlider = new Slider(0f, 1f, 0.1f, false, skin);
+
+            mainTable.add(volumeSlider).width(400).height(50).padBottom(25);
+            mainTable.row();
+
+            return volumeSlider;
+
+        }
+
+        return null;
 
     }
 
@@ -268,7 +276,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
         // audio
 
-        if (disposeMusic) {mainMenuMusic.dispose();}
+        //mainMenuMusic.dispose();
 
         stage.dispose();
 

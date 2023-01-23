@@ -183,9 +183,9 @@ public class GameScreen extends ScreenAdapter {
         vineBoom = Assets.manager.get(Assets.vineBoom, Music.class);
         endLevelTheme = Assets.manager.get(Assets.endLevelTheme, Music.class);
 
-        saulMusic.setVolume(0.7f);
-        saulSound.setVolume(0.8f);
-        vineBoom.setVolume(0.8f);
+        saulMusic.setVolume(0.7f * parent.volume);
+        saulSound.setVolume(0.8f * parent.volume);
+        vineBoom.setVolume(0.8f * parent.volume);
 
         saulMusic.setLooping(true);
         saulSound.setLooping(true);
@@ -620,7 +620,7 @@ public class GameScreen extends ScreenAdapter {
         saulSound.stop();
         vineBoom.stop();
 
-        /*addButton("Play Again").addListener(new ClickListener() {
+        /*addTextButton("Play Again").addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent even, float x, float y)
             {
@@ -669,13 +669,13 @@ public class GameScreen extends ScreenAdapter {
 
                     if (playerScore < maxScore) {
 
-                        explosionSound.play(0.5f);
-                        enemyHurtSound.play(1f);
+                        explosionSound.play(0.5f * parent.volume);
+                        enemyHurtSound.play(1f * parent.volume);
 
                     } else {
 
-                        bigExplosionSound.play(1.7f);
-                        endLevelTheme.setVolume(2f);
+                        bigExplosionSound.play(1.7f * parent.volume);
+                        endLevelTheme.setVolume(2f * parent.volume);
                         endLevelTheme.play();
 
                     }
@@ -706,14 +706,14 @@ public class GameScreen extends ScreenAdapter {
 
                     if (enemyScore < maxScore) {
 
-                        explosionSound.play(0.5f);
-                        playerHurtSound.play(1f);
+                        explosionSound.play(0.5f * parent.volume);
+                        playerHurtSound.play(1f * parent.volume);
 
 
                     } else {
 
-                        bigExplosionSound.play(1.7f);
-                        endLevelTheme.setVolume(2f);
+                        bigExplosionSound.play(1.7f * parent.volume);
+                        endLevelTheme.setVolume(2f * parent.volume);
                         endLevelTheme.play();
 
                     }
