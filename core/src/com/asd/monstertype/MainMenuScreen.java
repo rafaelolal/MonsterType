@@ -50,7 +50,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
     // timing
 
-    private float[] backgroundOffsets = {0, 0, 0};
+    private float[] backgroundOffsets = {0, 0, 0, 0, 0};
     private float backgroundMaxScrollingSpeed;
 
     // world parameters
@@ -73,8 +73,6 @@ public class MainMenuScreen extends ScreenAdapter {
 
     // audio
 
-    private Music mainMenuMusic;
-
     public MainMenuScreen(GameClass gameClass) {
 
         // GameClass Setup
@@ -83,11 +81,13 @@ public class MainMenuScreen extends ScreenAdapter {
 
         // initialize backgrounds
 
-        backgrounds = new Texture[3];
+        backgrounds = new Texture[5];
 
-        backgrounds[0] = Assets.manager.get(Assets.mainMenuBackground, Texture.class);
-        backgrounds[1] = Assets.manager.get(Assets.mainMenuBackground2, Texture.class);
-        backgrounds[2] = Assets.manager.get(Assets.mainMenuBackground3, Texture.class);
+        backgrounds[0] = Assets.manager.get(Assets.mainMenuBackground0, Texture.class);
+        backgrounds[1] = Assets.manager.get(Assets.mainMenuBackground1, Texture.class);
+        backgrounds[2] = Assets.manager.get(Assets.mainMenuBackground2, Texture.class);
+        backgrounds[3] = Assets.manager.get(Assets.mainMenuBackground3, Texture.class);
+        backgrounds[4] = Assets.manager.get(Assets.mainMenuBackground4, Texture.class);
 
         backgroundMaxScrollingSpeed =  (float)(WORLD_HEIGHT) / 2;
 
@@ -99,10 +99,11 @@ public class MainMenuScreen extends ScreenAdapter {
 
         // audio
 
-        mainMenuMusic = Assets.manager.get(Assets.mainMenuMusic, Music.class);
+        parent.mainMenuMusic = Assets.manager.get(Assets.mainMenuMusic, Music.class);
 
-        mainMenuMusic.setVolume(0.7f * parent.volume);
-        mainMenuMusic.play();
+        parent.mainMenuMusic.setVolume(0.7f * parent.masterMusicVolume);
+        parent.mainMenuMusic.play();
+        parent.mainMenuMusic.setLooping(true);
 
 
         batch = new SpriteBatch();
@@ -156,7 +157,7 @@ public class MainMenuScreen extends ScreenAdapter {
             backgroundOffsets[0] = 0;
         }
 
-        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * 3/2);
+        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * (3/2));
 
         batch.draw(backgrounds[1], -backgroundOffsets[1], 60, WORLD_WIDTH / (5/2), WORLD_HEIGHT / (5/2));
         batch.draw(backgrounds[1], -backgroundOffsets[1] + WORLD_WIDTH, 60, WORLD_WIDTH / (5/2), WORLD_HEIGHT / (5/2));
@@ -165,7 +166,7 @@ public class MainMenuScreen extends ScreenAdapter {
             backgroundOffsets[1] = 0;
         }
 
-        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed * 3/2);
+        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed * (3/2));
 
         batch.draw(backgrounds[2], backgroundOffsets[2], 450, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
         batch.draw(backgrounds[2], backgroundOffsets[2] - WORLD_WIDTH, 450, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
@@ -174,7 +175,23 @@ public class MainMenuScreen extends ScreenAdapter {
             backgroundOffsets[2] = 0;
         }
 
+        backgroundOffsets[3] += (deltaTime * backgroundMaxScrollingSpeed);
 
+        batch.draw(backgrounds[3], 160, -backgroundOffsets[3], WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+        batch.draw(backgrounds[3], 160, -backgroundOffsets[3] + WORLD_HEIGHT, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+
+        if (backgroundOffsets[3] > WORLD_HEIGHT) {
+            backgroundOffsets[3] = 0;
+        }
+
+        backgroundOffsets[4] += (deltaTime * backgroundMaxScrollingSpeed);
+
+        batch.draw(backgrounds[4], 650, backgroundOffsets[4], WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+        batch.draw(backgrounds[4], 650, backgroundOffsets[4] - WORLD_HEIGHT, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+
+        if (backgroundOffsets[4] > WORLD_HEIGHT) {
+            backgroundOffsets[4] = 0;
+        }
 
     }
 
@@ -231,8 +248,16 @@ public class MainMenuScreen extends ScreenAdapter {
             public void clicked(InputEvent even, float x, float y)
             {
                 disposeMusic = false;
+                parent.screenReturn = parent.MENU;
                 dispose();
                 parent.changeScreen(GameClass.SETTINGS);
+            }
+        });
+        addTextButton("Exit").addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent even, float x, float y)
+            {
+                System.exit(0);
             }
         });
 
@@ -268,7 +293,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
         // audio
 
-        if (disposeMusic) {mainMenuMusic.dispose();}
+        if (disposeMusic) {parent.mainMenuMusic.dispose();}
 
         stage.dispose();
 

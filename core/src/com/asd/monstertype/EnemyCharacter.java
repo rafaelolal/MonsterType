@@ -8,7 +8,7 @@ public class EnemyCharacter extends Character {
     //
     Vector2 directionVector;
     float timeSinceLastDirectionChange = 0;
-    float directionChangeFrequency = 0.8f;
+    float directionChangeFrequency = 0.4f;
 
     public EnemyCharacter(float movementSpeed, float width, float height, float xCenter, float yCenter,
                            TextureRegion characterTextureRegion, TextureRegion projectileTextureRegion) {

@@ -54,7 +54,7 @@ public class SettingsScreen extends ScreenAdapter {
 
     // timing
 
-    private float[] backgroundOffsets = {0, 0, 0};
+    private float[] backgroundOffsets = {0, 0, 0, 0, 0};
     private float backgroundMaxScrollingSpeed;
 
     // world parameters
@@ -62,16 +62,16 @@ public class SettingsScreen extends ScreenAdapter {
     private final int WORLD_WIDTH = 1280;
     private final int WORLD_HEIGHT = 720;
 
-    private boolean playWithAI;
-
     // HUD
 
     BitmapFont font1;
     BitmapFont font2;
 
-    private final int VOLUME = 0;
+    private final int MUSICVOLUME = 0;
+    private final int SOUNDVOLUME = 1;
 
-    Slider volumeSlider;
+    private Slider musicSlider;
+    private Slider soundSlider;
 
     // font Generators
 
@@ -86,11 +86,13 @@ public class SettingsScreen extends ScreenAdapter {
 
         // initialize backgrounds
 
-        backgrounds = new Texture[3];
+        backgrounds = new Texture[5];
 
-        backgrounds[0] = Assets.manager.get(Assets.mainMenuBackground, Texture.class);
-        backgrounds[1] = Assets.manager.get(Assets.mainMenuBackground2, Texture.class);
-        backgrounds[2] = Assets.manager.get(Assets.mainMenuBackground3, Texture.class);
+        backgrounds[0] = Assets.manager.get(Assets.mainMenuBackground0, Texture.class);
+        backgrounds[1] = Assets.manager.get(Assets.mainMenuBackground1, Texture.class);
+        backgrounds[2] = Assets.manager.get(Assets.mainMenuBackground2, Texture.class);
+        backgrounds[3] = Assets.manager.get(Assets.mainMenuBackground3, Texture.class);
+        backgrounds[4] = Assets.manager.get(Assets.mainMenuBackground4, Texture.class);
 
         backgroundMaxScrollingSpeed =  (float)(WORLD_HEIGHT) / 2;
 
@@ -139,7 +141,9 @@ public class SettingsScreen extends ScreenAdapter {
 
         font1.draw(batch, "Settings", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 3/4 + font1.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
 
-        font2.draw(batch, "Volume", volumeSlider.getX() - 500, volumeSlider.getY() + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
+        font2.draw(batch, "Music Volume", musicSlider.getX() - 450, musicSlider.getY() + font2.getXHeight() + 15, (float)WORLD_WIDTH * 1/2, Align.center, false);
+
+        font2.draw(batch, "Sound Volume", musicSlider.getX() - 450, soundSlider.getY() + font2.getXHeight() + 15, (float)WORLD_WIDTH * 1/2, Align.center, false);
 
         stage.act();
         stage.draw();
@@ -159,7 +163,7 @@ public class SettingsScreen extends ScreenAdapter {
             backgroundOffsets[0] = 0;
         }
 
-        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * 3/2);
+        backgroundOffsets[1] += (deltaTime * backgroundMaxScrollingSpeed * (3/2));
 
         batch.draw(backgrounds[1], -backgroundOffsets[1], 60, WORLD_WIDTH / (5/2), WORLD_HEIGHT / (5/2));
         batch.draw(backgrounds[1], -backgroundOffsets[1] + WORLD_WIDTH, 60, WORLD_WIDTH / (5/2), WORLD_HEIGHT / (5/2));
@@ -168,7 +172,7 @@ public class SettingsScreen extends ScreenAdapter {
             backgroundOffsets[1] = 0;
         }
 
-        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed * 3/2);
+        backgroundOffsets[2] += (deltaTime * backgroundMaxScrollingSpeed * (3/2));
 
         batch.draw(backgrounds[2], backgroundOffsets[2], 450, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
         batch.draw(backgrounds[2], backgroundOffsets[2] - WORLD_WIDTH, 450, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
@@ -177,11 +181,25 @@ public class SettingsScreen extends ScreenAdapter {
             backgroundOffsets[2] = 0;
         }
 
+        backgroundOffsets[3] += (deltaTime * backgroundMaxScrollingSpeed);
 
+        batch.draw(backgrounds[3], 160, -backgroundOffsets[3], WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+        batch.draw(backgrounds[3], 160, -backgroundOffsets[3] + WORLD_HEIGHT, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+
+        if (backgroundOffsets[3] > WORLD_HEIGHT) {
+            backgroundOffsets[3] = 0;
+        }
+
+        backgroundOffsets[4] += (deltaTime * backgroundMaxScrollingSpeed);
+
+        batch.draw(backgrounds[4], 650, backgroundOffsets[4], WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+        batch.draw(backgrounds[4], 650, backgroundOffsets[4] - WORLD_HEIGHT, WORLD_WIDTH / 3, WORLD_HEIGHT / 3);
+
+        if (backgroundOffsets[4] > WORLD_HEIGHT) {
+            backgroundOffsets[4] = 0;
+        }
 
     }
-
-    protected boolean getPlayWithAI() {return playWithAI;}
 
     private void detectInput(float deltaTime) {
 
@@ -207,24 +225,39 @@ public class SettingsScreen extends ScreenAdapter {
 
         stage.addActor(mainTable);
 
-        mainTable.setPosition(0, 25);
-
-        addSlider(VOLUME).addListener(new ChangeListener() {
+        addSlider(MUSICVOLUME).addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
 
-                parent.volume = volumeSlider.getValue();
+                parent.setMasterMusicVolume(musicSlider.getValue());
+                parent.masterMusicVolume = musicSlider.getValue();
 
             }
         });
+
+        addSlider(SOUNDVOLUME).addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+
+                parent.masterSoundVolume = soundSlider.getValue();
+
+            }
+        });
+
 
         addTextButton("Back").addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent even, float x, float y)
             {
-                dispose();
-                parent.changeScreen(GameClass.MENU);
+
+                if (parent.screenReturn == parent.MENU) {
+                    dispose();
+                    parent.changeScreen(GameClass.MENU);
+                } else {
+                    parent.changeScreen(GameClass.GAME);
+                }
             }
         });
 
@@ -244,14 +277,25 @@ public class SettingsScreen extends ScreenAdapter {
 
     private Slider addSlider(int slider) {
 
-        if (slider == VOLUME) {
+        if (slider == MUSICVOLUME) {
 
-            volumeSlider = new Slider(0f, 1f, 0.1f, false, skin);
+            musicSlider = new Slider(0f, 1f, 0.005f, false, skin);
+            musicSlider.setValue(parent.masterMusicVolume);
 
-            mainTable.add(volumeSlider).width(400).height(50).padBottom(25);
+            mainTable.add(musicSlider).width(400).height(50).padBottom(25);
             mainTable.row();
 
-            return volumeSlider;
+            return musicSlider;
+
+        } else if (slider == SOUNDVOLUME) {
+
+            soundSlider = new Slider(0f, 1f, 0.01f, false, skin);
+            soundSlider.setValue(parent.masterSoundVolume);
+
+            mainTable.add(soundSlider).width(400).height(50).padBottom(25);
+            mainTable.row();
+
+            return soundSlider;
 
         }
 

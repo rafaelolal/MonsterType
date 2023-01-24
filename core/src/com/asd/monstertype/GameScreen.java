@@ -7,10 +7,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -63,12 +60,22 @@ public class GameScreen extends ScreenAdapter {
 
     // world parameters
 
+    private enum State {
+
+        RUN, PAUSE
+
+    }
+
+    private State state = State.RUN;
+
     private final int WORLD_WIDTH = 1280;
     private final int WORLD_HEIGHT = 720;
     private Rectangle worldBoundingBox = new Rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     private boolean levelEnded = false;
     private boolean playWithAI;
     private String enemyName;
+
+    private boolean disposeAudio;
 
     // game objects
 
@@ -87,11 +94,7 @@ public class GameScreen extends ScreenAdapter {
 
     // audio
 
-    private Music saulMusic;
-    private Music saulSound;
-    private Music vineBoom;
     private Music endLevelTheme;
-
     private Sound explosionSound;
     private Sound playerHurtSound;
     private Sound enemyHurtSound;
@@ -144,7 +147,7 @@ public class GameScreen extends ScreenAdapter {
 
         // game objects set up
 
-        playerCharacter = new PlayerCharacter(500, 200, 140,
+        playerCharacter = new PlayerCharacter(600, 200, 140,
                 WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
                 playerCharacterTextureRegion, playerProjectileTextureRegion);
 
@@ -163,7 +166,7 @@ public class GameScreen extends ScreenAdapter {
 
         if (playWithAI) {
 
-            enemyName = "Enemy";
+            enemyName = "A";
 
         } else {
 
@@ -178,24 +181,28 @@ public class GameScreen extends ScreenAdapter {
 
         // MUSIC
 
-        saulMusic = Assets.manager.get(Assets.saulMusic, Music.class);
-        saulSound = Assets.manager.get(Assets.saulSound, Music.class);
-        vineBoom = Assets.manager.get(Assets.vineBoom, Music.class);
+        Assets.manager.load(Assets.saulSound, Music.class);
+
+        parent.saulMusic = Assets.manager.get(Assets.saulMusic, Music.class);
+        parent.saulSound = Assets.manager.get(Assets.saulSound, Music.class);
+        parent.vineBoom = Assets.manager.get(Assets.vineBoom, Music.class);
         endLevelTheme = Assets.manager.get(Assets.endLevelTheme, Music.class);
 
-        saulMusic.setVolume(0.7f * parent.volume);
-        saulSound.setVolume(0.8f * parent.volume);
-        vineBoom.setVolume(0.8f * parent.volume);
+        parent.saulMusic.setVolume(0.7f * parent.masterMusicVolume);
+        parent.saulSound.setVolume(0.8f * parent.masterMusicVolume);
+        parent.vineBoom.setVolume(0.8f * parent.masterMusicVolume);
 
-        saulMusic.setLooping(true);
-        saulSound.setLooping(true);
-        vineBoom.setLooping(true);
+        parent.saulMusic.setLooping(true);
+        parent.saulSound.setLooping(true);
+        parent.vineBoom.setLooping(true);
 
-        saulMusic.play();
-        saulSound.play();
-        vineBoom.play();
+        parent.saulMusic.play();
+        parent.saulSound.play();
+        parent.vineBoom.play();
 
         // SOUNDS
+
+        Assets.loadSounds();
 
         explosionSound = Assets.manager.get(Assets.explosionSound, Sound.class);
         playerHurtSound = Assets.manager.get(Assets.mikeHurt, Sound.class);
@@ -244,9 +251,9 @@ public class GameScreen extends ScreenAdapter {
 
         hudCenterX = (float)WORLD_WIDTH * 1/3;
 
-        hudRow1Y = WORLD_HEIGHT - hudVerticalMargin;
+        hudRow1Y = WORLD_HEIGHT - hudVerticalMargin * 2;
 
-        hudRow2Y = hudRow1Y - hudVerticalMargin - font1.getCapHeight();
+        hudRow2Y = hudRow1Y - hudVerticalMargin * 2 - font1.getCapHeight();
 
         hudSectionWidth = hudCenterX;
 
@@ -259,45 +266,54 @@ public class GameScreen extends ScreenAdapter {
 
         detectInput(deltaTime);
 
-        if (!levelEnded) {
+        switch (state) {
 
-            // update characters
+            case RUN:
 
-            playerCharacter.update(deltaTime);
-            enemyCharacter.update(deltaTime);
+                // update characters
 
-            // draw background
+                playerCharacter.update(deltaTime);
+                enemyCharacter.update(deltaTime);
 
-            renderBackgrounds(deltaTime);
+                // draw background
 
-            // draw playerCharacter
+                renderBackgrounds(deltaTime);
 
-            playerCharacter.draw(batch);
+                // draw playerCharacter
 
-            // draw enemyCharacter
+                playerCharacter.draw(batch);
 
-            enemyCharacter.draw(batch);
+                // draw enemyCharacter
 
-            // projectiles
+                enemyCharacter.draw(batch);
 
-            renderProjectiles(deltaTime);
+                // projectiles
 
-            // detect collisions
+                renderProjectiles(deltaTime);
 
-            detectCollisions();
+                // detect collisions
 
-            // explosions
+                detectCollisions();
 
-            updateAndRenderExplosions(deltaTime);
+                // explosions
 
-            // hud
+                updateAndRenderExplosions(deltaTime);
 
-            updateAndRenderHUD();
+                // hud
+
+                updateAndRenderHUD();
+
+                break;
+
+            case PAUSE:
+
+                break;
 
         }
 
         if (enemyScore >= maxScore || playerScore >= maxScore) {
 
+            state = State.PAUSE;
             bigExplosion.update(deltaTime);
             bigExplosion.draw(batch);
 
@@ -308,13 +324,15 @@ public class GameScreen extends ScreenAdapter {
         stage.act();
         stage.draw();
 
+        //Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
+
         batch.end();
 
     }
 
     private void detectInput(float deltaTime) {
 
-        if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+        if (levelEnded && Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
 
             dispose();
             parent.gameScreen = null;
@@ -455,6 +473,18 @@ public class GameScreen extends ScreenAdapter {
         } else {
 
             yMove = Math.max(yMove, downLimit);
+
+        }
+
+        if (enemyCharacter.boundingBox.getX() == rightLimit || enemyCharacter.boundingBox.getX() == leftLimit) {
+
+            xMove *= -1;
+
+        }
+
+        if (enemyCharacter.boundingBox.getY() == upLimit || enemyCharacter.boundingBox.getY() == downLimit) {
+
+            yMove *= -1;
 
         }
 
@@ -600,6 +630,9 @@ public class GameScreen extends ScreenAdapter {
     private void endLevel() {
 
         levelEnded = true;
+        disposeAudio = true;
+
+        mainTable.remove();
 
         font2.getData().setScale(1.5f);
 
@@ -609,27 +642,16 @@ public class GameScreen extends ScreenAdapter {
 
         } else {
 
-            font2.draw(batch, "PLAYER TWO WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
+            font2.draw(batch, enemyName + "I WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
 
         }
 
         font2.getData().setScale(0.7f);
         font2.draw(batch, "Press ENTER to play again", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/4 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
 
-        saulMusic.stop();
-        saulSound.stop();
-        vineBoom.stop();
-
-        /*addTextButton("Play Again").addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent even, float x, float y)
-            {
-                dispose();
-                parent.gameScreen = null;
-                parent.changeScreen(GameClass.MENU);
-                //parent.gameScreen = null;
-            }
-        });*/
+        parent.saulMusic.stop();
+        parent.saulSound.stop();
+        parent.vineBoom.stop();
 
     }
 
@@ -669,13 +691,13 @@ public class GameScreen extends ScreenAdapter {
 
                     if (playerScore < maxScore) {
 
-                        explosionSound.play(0.5f * parent.volume);
-                        enemyHurtSound.play(1f * parent.volume);
+                        explosionSound.play(0.5f * parent.masterSoundVolume);
+                        enemyHurtSound.play(1f * parent.masterSoundVolume);
 
                     } else {
 
-                        bigExplosionSound.play(1.7f * parent.volume);
-                        endLevelTheme.setVolume(2f * parent.volume);
+                        bigExplosionSound.play(1.7f * parent.masterSoundVolume);
+                        endLevelTheme.setVolume(2f * parent.masterMusicVolume);
                         endLevelTheme.play();
 
                     }
@@ -706,14 +728,14 @@ public class GameScreen extends ScreenAdapter {
 
                     if (enemyScore < maxScore) {
 
-                        explosionSound.play(0.5f * parent.volume);
-                        playerHurtSound.play(1f * parent.volume);
+                        explosionSound.play(0.5f * parent.masterSoundVolume);
+                        playerHurtSound.play(1f * parent.masterSoundVolume);
 
 
                     } else {
 
-                        bigExplosionSound.play(1.7f * parent.volume);
-                        endLevelTheme.setVolume(2f * parent.volume);
+                        bigExplosionSound.play(1.7f * parent.masterSoundVolume);
+                        endLevelTheme.setVolume(2f * parent.masterMusicVolume);
                         endLevelTheme.play();
 
                     }
@@ -731,6 +753,11 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void show() {
 
+        explosionSound = Assets.manager.get(Assets.explosionSound, Sound.class);
+        playerHurtSound = Assets.manager.get(Assets.mikeHurt, Sound.class);
+        enemyHurtSound = Assets.manager.get(Assets.hectorHurt, Sound.class);
+        bigExplosionSound = Assets.manager.get(Assets.bigExplosionSound, Sound.class);
+
         camera = new OrthographicCamera();
         viewport = new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
 
@@ -741,16 +768,42 @@ public class GameScreen extends ScreenAdapter {
 
         stage.addActor(mainTable);
 
-        mainTable.setPosition(0, -200);
+        mainTable.setPosition(-385, 335);
+
+        Gdx.input.setInputProcessor(stage);
+
+        addTextButton("Settings").addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent even, float x, float y)
+            {
+                disposeAudio = false;
+                parent.screenReturn = parent.GAME;
+                parent.changeScreen(GameClass.SETTINGS);
+            }
+        });
 
     }
 
-    private TextButton addButton(String name) {
+    private TextButton addTextButton(String name) {
 
         TextButton button = new TextButton(name, skin);
-        mainTable.add(button).width(1000).padBottom(10);
+        mainTable.add(button).width(400).padBottom(10);
         mainTable.row();
         return button;
+
+    }
+
+    @Override
+    public void pause() {
+
+        state = State.PAUSE;
+
+    }
+
+    @Override
+    public void resume() {
+
+        state = State.RUN;
 
     }
 
@@ -765,8 +818,9 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void dispose() {
 
-        disposeAudio();
         disposeFonts();
+
+        if (disposeAudio) disposeAudio();
 
         //batch.dispose();
 
@@ -774,11 +828,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void disposeAudio() {
 
-        // MUSIC
-
-        saulMusic.dispose();
-        saulSound.dispose();
-        vineBoom.dispose();
+        Assets.unloadSounds();
         endLevelTheme.dispose();
 
     }
