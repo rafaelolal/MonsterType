@@ -73,6 +73,7 @@ public class GameScreen extends ScreenAdapter {
     private Rectangle worldBoundingBox = new Rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     private boolean levelEnded = false;
     private boolean playWithAI;
+    private String playerName;
     private String enemyName;
 
     private boolean disposeAudio;
@@ -90,7 +91,7 @@ public class GameScreen extends ScreenAdapter {
     private int playerScore = 0;
     private int enemyScore = 0;
 
-    private int maxScore = 10;
+    private int maxScore = 30;
 
     // audio
 
@@ -164,13 +165,15 @@ public class GameScreen extends ScreenAdapter {
 
         // FONTS & HUD
 
+        playerName = parent.playerName;
+
         if (playWithAI) {
 
             enemyName = "A";
 
         } else {
 
-            enemyName = "Player Two";
+            enemyName = parent.enemyName;
 
         }
 
@@ -638,7 +641,7 @@ public class GameScreen extends ScreenAdapter {
 
         if (playerScore > enemyScore) {
 
-            font2.draw(batch, "PLAYER ONE WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
+            font2.draw(batch, playerName + " WINS", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 1/2 + font2.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
 
         } else {
 
@@ -659,7 +662,7 @@ public class GameScreen extends ScreenAdapter {
 
         // top row
 
-        font1.draw(batch, "Player One Score", hudLeftX, hudRow1Y, hudSectionWidth, Align.left, false);
+        font1.draw(batch, playerName + " Score", hudLeftX, hudRow1Y, hudSectionWidth, Align.left, false);
 
         font1.draw(batch, enemyName + " Score", hudRightX, hudRow1Y, hudSectionWidth, Align.right, false);
 

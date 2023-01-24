@@ -1,9 +1,6 @@
 package com.asd.monstertype;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
@@ -16,11 +13,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.*;
@@ -47,6 +48,9 @@ public class MainMenuScreen extends ScreenAdapter {
     private SpriteBatch batch;
 
     private Texture[] backgrounds;
+
+    private TextField textField1;
+    private TextField textField2;
 
     // timing
 
@@ -216,53 +220,96 @@ public class MainMenuScreen extends ScreenAdapter {
         viewport = new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
         stage = new Stage(viewport);
 
-        mainTable = new Table();
-        mainTable.setFillParent(true);
-
-        stage.addActor(mainTable);
-
-        mainTable.setPosition(0, -100);
+        createTable();
 
         addTextButton("Play With AI").addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent even, float x, float y)
             {
                 playWithAI = true;
-                disposeMusic = true;
-                dispose();
-                parent.changeScreen(GameClass.GAME);
+
+                stage.clear();
+
+                createTable();
+
+                textField1 = addTextField("Player One Name");
+
+                addTextButton("Play now!").addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y)
+                    {
+
+                        parent.playerName = textField1.getText();
+                        disposeMusic = true;
+                        dispose();
+                        parent.changeScreen(GameClass.GAME);
+
+
+                    }
+                });
+
             }
+
         });
+
+
         addTextButton("Play With Two Players").addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent even, float x, float y)
             {
                 playWithAI = false;
-                disposeMusic = true;
-                dispose();
-                parent.changeScreen(GameClass.GAME);
+
+                stage.clear();
+
+                createTable();
+
+                textField1 = addTextField("Player One Name");
+                textField2 = addTextField("Player Two Name");
+
+                addTextButton("Play now!").addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y)
+                    {
+
+                        parent.playerName = textField1.getText();
+                        parent.enemyName = textField2.getText();
+                        disposeMusic = true;
+                        dispose();
+                        parent.changeScreen(GameClass.GAME);
+
+
+                    }
+                });
+
             }
+
         });
-        addTextButton("Settings").addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent even, float x, float y)
-            {
-                disposeMusic = false;
-                parent.screenReturn = parent.MENU;
-                dispose();
-                parent.changeScreen(GameClass.SETTINGS);
-            }
-        });
+
         addTextButton("Exit").addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent even, float x, float y)
+            public void clicked(InputEvent event, float x, float y)
             {
                 System.exit(0);
             }
         });
 
 
+
+
+
+
         Gdx.input.setInputProcessor(stage);
+
+    }
+
+    private void createTable() {
+
+        mainTable = new Table();
+        mainTable.setFillParent(true);
+
+        stage.addActor(mainTable);
+
+        mainTable.setPosition(0, -100);
 
     }
 
@@ -273,6 +320,16 @@ public class MainMenuScreen extends ScreenAdapter {
         mainTable.add(button).width(700).height(50).padBottom(25);
         mainTable.row();
         return button;
+
+    }
+
+    private TextField addTextField(String name) {
+
+        TextField textField = new TextField(name, skin);
+
+        mainTable.add(textField).width(700).height(50).padBottom(25);
+        mainTable.row();
+        return textField;
 
     }
 

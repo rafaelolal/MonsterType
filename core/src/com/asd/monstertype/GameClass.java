@@ -26,6 +26,11 @@ public class GameClass extends Game {
 
 	protected int screenReturn;
 
+	// string parameters
+
+	protected String playerName;
+	protected String enemyName;
+
 	// audio
 
 	protected Music mainMenuMusic;
@@ -34,6 +39,7 @@ public class GameClass extends Game {
 	protected Music vineBoom;
 	public static float masterMusicVolume = 1f;
 	public static float masterSoundVolume = 1f;
+
 
 
 
