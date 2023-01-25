@@ -139,6 +139,20 @@ public class MainMenuScreen extends ScreenAdapter {
 
         detectInput(deltaTime);
 
+        // restrict character name length
+
+        if (textField1 != null && textField1.getText().length() > 15) {
+
+            textField1.setText(textField1.getText().substring(0, 14));
+
+        }
+
+        if (textField2 != null && textField2.getText().length() > 15) {
+
+            textField2.setText(textField2.getText().substring(0, 14));
+
+        }
+
         renderBackgrounds(deltaTime);
 
         font1.draw(batch, "Breaking Bad Gme", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 2/3 + font1.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
@@ -240,6 +254,7 @@ public class MainMenuScreen extends ScreenAdapter {
                     {
 
                         parent.playerName = textField1.getText();
+
                         disposeMusic = true;
                         dispose();
                         parent.changeScreen(GameClass.GAME);
@@ -273,6 +288,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
                         parent.playerName = textField1.getText();
                         parent.enemyName = textField2.getText();
+
                         disposeMusic = true;
                         dispose();
                         parent.changeScreen(GameClass.GAME);
@@ -283,6 +299,17 @@ public class MainMenuScreen extends ScreenAdapter {
 
             }
 
+        });
+
+        addTextButton("Settings").addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent even, float x, float y)
+            {
+                disposeMusic = false;
+                parent.screenReturn = parent.MENU;
+                dispose();
+                parent.changeScreen(GameClass.SETTINGS);
+            }
         });
 
         addTextButton("Exit").addListener(new ClickListener() {

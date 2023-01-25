@@ -152,6 +152,8 @@ public class GameScreen extends ScreenAdapter {
                 WORLD_WIDTH / 2, WORLD_HEIGHT * 1/4,
                 playerCharacterTextureRegion, playerProjectileTextureRegion);
 
+        playerCharacter.setTimeBetweenShots(0.005f);
+
         enemyCharacter = new EnemyCharacter(500, 200, 140,
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
@@ -242,7 +244,7 @@ public class GameScreen extends ScreenAdapter {
         // scale font
 
         font1.getData().setScale(0.8f);
-        font2.getData().setScale(0.6f);
+        font2.getData().setScale(0.7f);
 
         // calculate hud parameters
 
@@ -388,9 +390,25 @@ public class GameScreen extends ScreenAdapter {
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && downLimit < 0) {
 
-            float yChange = Math.max(-playerCharacter.movementSpeed * deltaTime, leftLimit);
+            float yChange = Math.max(-playerCharacter.movementSpeed * deltaTime, downLimit);
 
             playerCharacter.translate(0f, yChange);
+
+        }
+
+        // key to shoot
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+
+            if (playerCharacter.canFireProjectile()) {
+
+                Projectile[] projectiles = playerCharacter.fireProjectiles();
+
+                for (Projectile projectile : projectiles) {
+                    playerProjectileList.add(projectile);
+                }
+
+            }
 
         }
 
@@ -399,7 +417,19 @@ public class GameScreen extends ScreenAdapter {
             // AI
             moveEnemies(deltaTime);
 
+            if (enemyCharacter.canFireProjectile()) {
+
+                Projectile[] projectiles = enemyCharacter.fireProjectiles();
+
+                for (Projectile projectile : projectiles) {
+                    enemyProjectileList.add(projectile);
+                }
+
+            }
+
         } else {
+
+            enemyCharacter.setTimeBetweenShots(0.005f);
 
             // ENEMY PLAYER CONTROL
 
@@ -436,13 +466,29 @@ public class GameScreen extends ScreenAdapter {
 
             if (Gdx.input.isKeyPressed(Input.Keys.S) && downLimit < 0) {
 
-                float yChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, leftLimit);
+                float yChange = Math.max(-enemyCharacter.movementSpeed * deltaTime, downLimit);
 
                 enemyCharacter.translate(0f, yChange);
 
             }
 
+            if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+
+                if (enemyCharacter.canFireProjectile()) {
+
+                    Projectile[] projectiles = enemyCharacter.fireProjectiles();
+
+                    for (Projectile projectile : projectiles) {
+                        enemyProjectileList.add(projectile);
+                    }
+
+                }
+
+            }
+
         }
+
+
 
     }
 
@@ -553,26 +599,6 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void renderProjectiles(float deltaTime) {
-
-        if (playerCharacter.canFireProjectile()) {
-
-            Projectile[] projectiles = playerCharacter.fireProjectiles();
-
-            for (Projectile projectile: projectiles) {
-                playerProjectileList.add(projectile);
-            }
-
-        }
-
-        if (enemyCharacter.canFireProjectile()) {
-
-            Projectile[] projectiles = enemyCharacter.fireProjectiles();
-
-            for (Projectile projectile: projectiles) {
-                enemyProjectileList.add(projectile);
-            }
-
-        }
 
         // draw & remove old projectiles
 
