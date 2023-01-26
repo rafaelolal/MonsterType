@@ -21,8 +21,8 @@ public abstract class Character {
     // projectile information
 
     protected float projectileWidth = 50, projectileHeight = 50;
-    protected float projectileMovementSpeed = 200;
-    protected float timeBetweenShots = 1;
+    protected float projectileMovementSpeed = 500;
+    protected float timeBetweenShots = 0.2f;
     protected float timeSinceLastShot = 0;
 
 
@@ -44,11 +44,8 @@ public abstract class Character {
 
     }
 
-    public void changeProjectileCharacteristics(float projectileWidth, float projectileHeight, float projectileMovementSpeed, float timeBetweenShots) {
+    public void setTimeBetweenShots(float timeBetweenShots) {
 
-        this.projectileWidth = projectileWidth;
-        this.projectileHeight = projectileHeight;
-        this.projectileMovementSpeed = projectileMovementSpeed;
         this.timeBetweenShots = timeBetweenShots;
 
     }
@@ -67,9 +64,9 @@ public abstract class Character {
 
     }
 
-    public void hit(Projectile projectile) {
+    public boolean hitAndCheckDestroyed(Projectile projectile) {
 
-
+        return true;
 
     }
 
