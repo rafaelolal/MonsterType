@@ -2,11 +2,7 @@ sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["../assets"]
 
-<<<<<<< HEAD
-project.ext.mainClassName = "com.mygdx.game.DesktopLauncher"
-=======
 project.ext.mainClassName = "com.asd.monstertype.DesktopLauncher"
->>>>>>> origin/sandro
 project.ext.assetsDir = new File("../assets")
 
 import org.gradle.internal.os.OperatingSystem
