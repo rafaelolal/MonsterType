@@ -2,9 +2,7 @@ package com.asd.monstertype;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
@@ -21,8 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -52,6 +48,8 @@ public class GameScreen extends ScreenAdapter {
     private float backgroundHeight;
 
     private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion, playerProjectileTextureRegion, enemyProjectileTextureRegion;
+
+    private Texture explosionTexture;
 
     //timing
 
@@ -119,13 +117,11 @@ public class GameScreen extends ScreenAdapter {
         parent = gameClass;
         this.playWithAI = playWithAI;
 
-        // texture atlas setup
-
         // initialize backgrounds
 
         backgrounds = new TextureRegion[8];
 
-        backgrounds[0] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("gameBackground(TEMP)");
+        backgrounds[0] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("gameScreenBackground");
         backgrounds[1] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("walterWhite");
         backgrounds[2] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("jessePinkman");
         backgrounds[3] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("saulGoodman");
@@ -133,7 +129,7 @@ public class GameScreen extends ScreenAdapter {
         backgrounds[4] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
         backgrounds[5] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
         backgrounds[6] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
-        backgrounds[7] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("rain");
+        backgrounds[7] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("backgroundCover");
 
         backgroundHeight = WORLD_HEIGHT * 2;
         backgroundMaxScrollingSpeed =  (float)(WORLD_HEIGHT) / 2;
@@ -145,6 +141,8 @@ public class GameScreen extends ScreenAdapter {
 
         playerProjectileTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hectorBell");
         enemyProjectileTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hectorBell");
+
+        explosionTexture = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("explosionTexture").getTexture();
 
         // game objects set up
 
@@ -158,7 +156,7 @@ public class GameScreen extends ScreenAdapter {
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
-        bigExplosion = new Explosion(Assets.manager.get(Assets.explosionTexture, Texture.class), worldBoundingBox, 10, 5f);
+        bigExplosion = new Explosion(explosionTexture, worldBoundingBox, 10, 5f);
 
         playerProjectileList = new LinkedList<>();
         enemyProjectileList = new LinkedList<>();
@@ -715,7 +713,7 @@ public class GameScreen extends ScreenAdapter {
                 // collision with enemy character
                 if (enemyCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(Assets.manager.get(Assets.explosionTexture, Texture.class), new Rectangle(enemyCharacter.boundingBox), 7,1f));
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(enemyCharacter.boundingBox), 7,1f));
                     playerScore++;
 
                     if (playerScore < maxScore) {
@@ -752,7 +750,7 @@ public class GameScreen extends ScreenAdapter {
                 // collision with player character
                 if (playerCharacter.hitAndCheckDestroyed(projectile)) {
 
-                    explosionList.add(new Explosion(Assets.manager.get(Assets.explosionTexture, Texture.class), new Rectangle(playerCharacter.boundingBox), 7,1f));
+                    explosionList.add(new Explosion(explosionTexture, new Rectangle(playerCharacter.boundingBox), 7,1f));
                     enemyScore++;
 
                     if (enemyScore < maxScore) {

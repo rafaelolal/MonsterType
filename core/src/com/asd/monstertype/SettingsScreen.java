@@ -50,7 +50,7 @@ public class SettingsScreen extends ScreenAdapter {
     //graphics
     private SpriteBatch batch;
 
-    private Texture[] backgrounds;
+    private TextureRegion[] backgrounds;
 
     // timing
 
@@ -86,13 +86,13 @@ public class SettingsScreen extends ScreenAdapter {
 
         // initialize backgrounds
 
-        backgrounds = new Texture[5];
+        backgrounds = new TextureRegion[5];
 
-        backgrounds[0] = Assets.manager.get(Assets.mainMenuBackground0, Texture.class);
-        backgrounds[1] = Assets.manager.get(Assets.mainMenuBackground1, Texture.class);
-        backgrounds[2] = Assets.manager.get(Assets.mainMenuBackground2, Texture.class);
-        backgrounds[3] = Assets.manager.get(Assets.mainMenuBackground3, Texture.class);
-        backgrounds[4] = Assets.manager.get(Assets.mainMenuBackground4, Texture.class);
+        backgrounds[0] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("walter");
+        backgrounds[1] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("walterJunior");
+        backgrounds[2] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("saulGoodman2");
+        backgrounds[3] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hankSchrader");
+        backgrounds[4] = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("gustavoFring");
 
         backgroundMaxScrollingSpeed =  (float)(WORLD_HEIGHT) / 2;
 

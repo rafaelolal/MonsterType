@@ -16,13 +16,7 @@ public class Assets {
 
     // textures
 
-    public static final String mainMenuBackground0 = "backgrounds/walter.png";
-    public static final String mainMenuBackground1 = "backgrounds/walterJunior.png";
-    public static final String mainMenuBackground2 = "backgrounds/saulGoodman.png";
-    public static final String mainMenuBackground3 = "backgrounds/hankSchrader.png";
-    public static final String mainMenuBackground4 = "backgrounds/gustavoFring.png";
     public static final String textureAtlas = "images.atlas";
-    public static final String explosionTexture = "explosion.png";
 
     // music
 
@@ -47,14 +41,7 @@ public class Assets {
 
         // textures
 
-        manager.load(mainMenuBackground0, Texture.class);
-        manager.load(mainMenuBackground1, Texture.class);
-        manager.load(mainMenuBackground2, Texture.class);
-        manager.load(mainMenuBackground3, Texture.class);
-        manager.load(mainMenuBackground4, Texture.class);
-
         manager.load(textureAtlas, TextureAtlas.class);
-        manager.load(explosionTexture, Texture.class);
 
         // uiSkin
 

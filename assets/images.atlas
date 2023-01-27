@@ -1,61 +1,110 @@
 
 images.png
-size: 4096, 2048
+size: 4096, 4096
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-gameBackground(TEMP)
+backgroundCover
   rotate: false
-  xy: 1884, 1142
+  xy: 1907, 1161
+  size: 1000, 618
+  orig: 1000, 618
+  offset: 0, 0
+  index: -1
+explosion
+  rotate: false
+  xy: 2931, 3162
+  size: 896, 896
+  orig: 896, 896
+  offset: 0, 0
+  index: -1
+gameScreenBackground
+  rotate: false
+  xy: 1878, 441
   size: 1280, 720
   orig: 1280, 720
   offset: 0, 0
   index: -1
+gustavoFring
+  rotate: false
+  xy: 1200, 412
+  size: 678, 998
+  orig: 678, 998
+  offset: 0, 0
+  index: -1
+hankSchrader
+  rotate: false
+  xy: 1907, 1779
+  size: 928, 1069
+  orig: 928, 1069
+  offset: 0, 0
+  index: -1
 hectorBell
   rotate: false
-  xy: 4024, 1792
-  size: 70, 70
-  orig: 70, 70
+  xy: 0, 210
+  size: 1200, 1200
+  orig: 1200, 1200
   offset: 0, 0
   index: -1
 hectorSalamanca
   rotate: false
-  xy: 1884, 1002
-  size: 200, 140
-  orig: 200, 140
+  xy: 0, 0
+  size: 300, 210
+  orig: 300, 210
   offset: 0, 0
   index: -1
 jessePinkman
   rotate: false
-  xy: 1024, 628
-  size: 860, 1234
-  orig: 860, 1234
+  xy: 0, 1410
+  size: 1907, 2648
+  orig: 1907, 2648
   offset: 0, 0
   index: -1
 mikeEhrm
   rotate: false
-  xy: 0, 0
-  size: 200, 140
-  orig: 200, 140
+  xy: 300, 0
+  size: 300, 210
+  orig: 300, 210
   offset: 0, 0
   index: -1
 rain
   rotate: false
-  xy: 3164, 962
-  size: 860, 900
-  orig: 860, 900
+  xy: 2835, 1818
+  size: 480, 320
+  orig: 480, 320
   offset: 0, 0
   index: -1
 saulGoodman
   rotate: false
-  xy: 0, 140
-  size: 920, 512
-  orig: 920, 512
+  xy: 2931, 2650
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+saulGoodman2
+  rotate: false
+  xy: 2835, 2138
+  size: 511, 512
+  orig: 511, 512
+  offset: 0, 0
+  index: -1
+walter
+  rotate: false
+  xy: 2907, 1453
+  size: 273, 365
+  orig: 273, 365
+  offset: 0, 0
+  index: -1
+walterJunior
+  rotate: false
+  xy: 3443, 2732
+  size: 339, 430
+  orig: 339, 430
   offset: 0, 0
   index: -1
 walterWhite
   rotate: false
-  xy: 0, 652
+  xy: 1907, 2848
   size: 1024, 1210
   orig: 1024, 1210
   offset: 0, 0
