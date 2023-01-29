@@ -2,7 +2,9 @@ package com.asd.monstertype;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
@@ -19,6 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -50,6 +54,7 @@ public class GameScreen extends ScreenAdapter {
     private TextureRegion playerCharacterTextureRegion, enemyCharacterTextureRegion, playerProjectileTextureRegion, enemyProjectileTextureRegion;
 
     private Texture explosionTexture;
+    private Texture bricks;
 
     //timing
 
@@ -142,7 +147,9 @@ public class GameScreen extends ScreenAdapter {
         playerProjectileTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hectorBell");
         enemyProjectileTextureRegion = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("hectorBell");
 
-        explosionTexture = (Assets.manager.get(Assets.textureAtlas, TextureAtlas.class)).findRegion("explosionTexture").getTexture();
+        explosionTexture = Assets.manager.get(Assets.explosionTexture, Texture.class);
+
+        bricks = Assets.manager.get(Assets.bricksTexture, Texture.class);
 
         // game objects set up
 
@@ -152,7 +159,7 @@ public class GameScreen extends ScreenAdapter {
 
         playerCharacter.setTimeBetweenShots(0.005f);
 
-        enemyCharacter = new EnemyCharacter(500, 200, 140,
+        enemyCharacter = new EnemyCharacter(600, 200, 140,
                 WORLD_WIDTH / 2.5f, WORLD_HEIGHT * 3/4,
                 enemyCharacterTextureRegion, enemyProjectileTextureRegion);
 
@@ -210,7 +217,7 @@ public class GameScreen extends ScreenAdapter {
         explosionSound = Assets.manager.get(Assets.explosionSound, Sound.class);
         playerHurtSound = Assets.manager.get(Assets.mikeHurt, Sound.class);
         enemyHurtSound = Assets.manager.get(Assets.hectorHurt, Sound.class);
-        bigExplosionSound = Assets.manager.get(Assets.bigExplosionSound, Sound.class);
+         bigExplosionSound = Assets.manager.get(Assets.bigExplosionSound, Sound.class);
 
 
         batch = new SpriteBatch();
@@ -358,7 +365,7 @@ public class GameScreen extends ScreenAdapter {
         rightLimit = WORLD_WIDTH - playerCharacter.boundingBox.getX() - playerCharacter.boundingBox.getWidth();
         leftLimit = -playerCharacter.boundingBox.getX();
 
-        upLimit = (float)WORLD_HEIGHT / 2 - playerCharacter.boundingBox.getY() - playerCharacter.boundingBox.getHeight();
+        upLimit = (float)WORLD_HEIGHT / 2 - playerCharacter.boundingBox.getY() - playerCharacter.boundingBox.getHeight() - (bricks.getHeight()) / 6;
         downLimit = -playerCharacter.boundingBox.getY();
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && rightLimit > 0) {
@@ -435,7 +442,7 @@ public class GameScreen extends ScreenAdapter {
             leftLimit = -enemyCharacter.boundingBox.getX();
 
             upLimit = WORLD_HEIGHT - enemyCharacter.boundingBox.getY() - enemyCharacter.boundingBox.getHeight();
-            downLimit = (float)WORLD_HEIGHT / 2 - enemyCharacter.boundingBox.getY();
+            downLimit = (float)WORLD_HEIGHT / 2 - enemyCharacter.boundingBox.getY() + (bricks.getHeight()) / 6;
 
             if (Gdx.input.isKeyPressed(Input.Keys.D) && rightLimit > 0) {
 
@@ -498,7 +505,7 @@ public class GameScreen extends ScreenAdapter {
         leftLimit = -enemyCharacter.boundingBox.getX();
 
         upLimit = WORLD_HEIGHT - enemyCharacter.boundingBox.getY() - enemyCharacter.boundingBox.getHeight();
-        downLimit = (float)WORLD_HEIGHT / 2 -enemyCharacter.boundingBox.getY();
+        downLimit = (float)WORLD_HEIGHT / 2 -enemyCharacter.boundingBox.getY() + (bricks.getHeight()) / 6;
 
         float xMove = enemyCharacter.getDirectionVector().x * enemyCharacter.movementSpeed * deltaTime;
         float yMove = enemyCharacter.getDirectionVector().y * enemyCharacter.movementSpeed * deltaTime;
@@ -593,6 +600,8 @@ public class GameScreen extends ScreenAdapter {
             batch.draw(backgrounds[layer], 0, -backgroundOffsets[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT);
 
         }
+
+        batch.draw(bricks, 0, WORLD_HEIGHT / 2 - (bricks.getHeight()) / 6, WORLD_WIDTH, bricks.getHeight() / 3);
 
     }
 

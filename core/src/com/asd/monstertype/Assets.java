@@ -16,7 +16,9 @@ public class Assets {
 
     // textures
 
-    public static final String textureAtlas = "images.atlas";
+    public static final String textureAtlas = "textures/images.atlas";
+    public static final String explosionTexture = "textures/explosionTexture.png";
+    public static final String bricksTexture = "textures/bricks.png";
 
     // music
 
@@ -42,6 +44,10 @@ public class Assets {
         // textures
 
         manager.load(textureAtlas, TextureAtlas.class);
+
+        manager.load(explosionTexture, Texture.class);
+
+        manager.load(bricksTexture, Texture.class);
 
         // uiSkin
 
