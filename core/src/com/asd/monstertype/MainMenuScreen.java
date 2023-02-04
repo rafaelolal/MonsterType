@@ -139,20 +139,6 @@ public class MainMenuScreen extends ScreenAdapter {
 
         detectInput(deltaTime);
 
-        // restrict character name length
-
-        if (textField1 != null && textField1.getText().length() > 12) {
-
-            textField1.setText(textField1.getText().substring(0, 11));
-
-        }
-
-        if (textField2 != null && textField2.getText().length() > 12) {
-
-            textField2.setText(textField2.getText().substring(0, 11));
-
-        }
-
         renderBackgrounds(deltaTime);
 
         font1.draw(batch, "Breaking Bad Gme", WORLD_WIDTH * 1/4, WORLD_HEIGHT * 2/3 + font1.getXHeight(), (float)WORLD_WIDTH * 1/2, Align.center, false);
@@ -280,6 +266,9 @@ public class MainMenuScreen extends ScreenAdapter {
 
                 textField1 = addTextField("Player One Name");
                 textField2 = addTextField("Player Two Name");
+
+                textField1.setMaxLength(12);
+                textField2.setMaxLength(12);
 
                 addTextButton("Play now!").addListener(new ClickListener() {
                     @Override
